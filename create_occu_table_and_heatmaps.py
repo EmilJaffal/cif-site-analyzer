@@ -335,6 +335,7 @@ def get_site_element_dist(dataframe: pd.DataFrame, site: str = None) -> pd.DataF
 def ptable_heatmap_mpl(vals_dict: dict, site: str, stype: str, cmap: str):
     
     # format site
+    elements_in_data = list(vals_dict.keys())
     if site is not None:
         ws = [v for v in re.split(r'\d+', site) if v !=''][0]
         nums = [s for s in site.split(ws) if s != ""]
@@ -398,14 +399,14 @@ def ptable_heatmap_mpl(vals_dict: dict, site: str, stype: str, cmap: str):
     im.axes.text(2, 7.1, '*', alpha=0.6, **kw)
     for k, v in elements.items():
         if site is not None:
-            if k in vals_dict:
+            if k in elements_in_data:
                 im.axes.text(v[1]-1, v[0]-1, k, c='k', **kw)
             else:
                 im.axes.text(v[1]-1, v[0]-1, k, c='k', alpha=0.6, **kw)
         else:
             c = 'w' if ((vals_dict[k] - min_value) / norm_const) > 0.6 else 'k'
-            if k in vals_dict:
-                im.axes.text(v[1]-1, v[0]-1, k, c=c, alpha=0.6, **kw)
+            if k in elements_in_data:
+                im.axes.text(v[1]-1, v[0]-1, k, c=c, **kw)
             else:
                 im.axes.text(v[1]-1, v[0]-1, k, c=c, alpha=0.6, **kw)
         #  path_effects=[patheffects.withStroke(linewidth=3, foreground='white')], 
@@ -522,17 +523,17 @@ if __name__ == "__main__":
     selected_entries = cif_file_data[cif_file_data['Structure type'] == selected_stype]['Filename'].to_list()
     shared = find_sites_with_same_wyckoff_symbols(os.path.join(root, selected_entries[0]))
     data0 = get_data_row(os.path.join(root, selected_entries[0]), shared)
-    sites = [k for k in data0.keys() if k not in ['Filename', 'Formula', 'Notes', 'Num Elements']]
-    sites = sorted(sites, key=lambda k: int(re.split('[a-z]', k)[0]))
-    sites = sorted(sites, key=lambda k: get_ws(k))
+    all_sites = [k for k in data0.keys() if k not in ['Filename', 'Formula', 'Notes', 'Num Elements']]
+    all_sites = sorted(all_sites, key=lambda k: int(re.split('[a-z]', k)[0]))
+    all_sites = sorted(all_sites, key=lambda k: get_ws(k))
     
-    if len(sites) > 5:
-        print(f"There are {len(sites)} sites present for this structure type.")
+    if len(all_sites) > 5:
+        print(f"There are {len(all_sites)} sites present for this structure type.")
         print("Please select a maximum of five sites from the the list below.")
         print("Enter the numbers separated by space. e.g. 1 3 4 6")
         
         print("\nNo Site")
-        for i, site in enumerate(sites, 1):
+        for i, site in enumerate(all_sites, 1):
             print(f"({i}) {site}")
 
         valid_input = False
@@ -541,26 +542,28 @@ if __name__ == "__main__":
             try:
                 res = res.replace(',', ' ')
                 res = [int(r) for r in res.split()]
-                assert np.all(np.array(res) <= len(sites))
-                sites = [sites[i-1] for i in res]
+                assert np.all(np.array(res) <= len(all_sites))
+                sites = [all_sites[i-1] for i in res]
                 valid_input = True
             except Exception as e:
                 print(e)
                 print("Invalid input. Try again.")
+    else:
+        sites = all_sites
 
     data = []
     
-    pos_data = dict(zip(sites, [[] for _ in range(len(data0)-2)]))
+    pos_data = dict(zip(all_sites, [[] for _ in range(len(data0)-2)]))
 
     for i in selected_entries:
         row_data_w_coords = get_data_row(os.path.join(root, i), shared)
-        for k in sites:
+        for k in all_sites:
             pos_data[k].append(row_data_w_coords[k][1])
             row_data_w_coords[k] = row_data_w_coords[k][0]
         data.append(row_data_w_coords)
     
     pos_row = dict(zip(data0.keys(), ["" for _ in range(len(data0))]))
-    for k in sites:
+    for k in all_sites:
         all_positions = np.array(pos_data[k])
         avg_positions = ""
         for i in range(3):
@@ -573,9 +576,13 @@ if __name__ == "__main__":
     data.insert(0, pos_row)
                 
     data = pd.DataFrame(data)
-    data.to_csv(f"{'-'.join(selected_stype.split(',')[:2])}.csv", index=False)
+    
+    columns = [c for c in data.columns if c not in all_sites]
+    columns.extend(all_sites)
+    data[columns].to_csv(f"{'-'.join(selected_stype.split(',')[:2])}.csv", index=False)
     cmaps = ["Reds", "Blues", "Greens", "Purples", "Oranges"]
     for i, site in enumerate(sites):
+        print(f"Processing {site}")
         ptable_heatmap_mpl(vals_dict=get_site_element_dist(data, site), site=site, stype=selected_stype, cmap=cmaps[i])
         # break
     
