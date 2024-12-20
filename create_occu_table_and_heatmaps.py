@@ -398,17 +398,11 @@ def ptable_heatmap_mpl(vals_dict: dict, site: str, stype: str, cmap: str):
     im.axes.text(2, 5.1, '*', alpha=0.6, **kw)
     im.axes.text(2, 7.1, '*', alpha=0.6, **kw)
     for k, v in elements.items():
-        if site is not None:
-            if k in elements_in_data:
-                im.axes.text(v[1]-1, v[0]-1, k, c='k', **kw)
-            else:
-                im.axes.text(v[1]-1, v[0]-1, k, c='k', alpha=0.6, **kw)
+        c = 'w' if ((vals_dict[k] - min_value) / norm_const) > 0.6 else 'k'
+        if k in elements_in_data:
+            im.axes.text(v[1]-1, v[0]-1, k, c=c, **kw)
         else:
-            c = 'w' if ((vals_dict[k] - min_value) / norm_const) > 0.6 else 'k'
-            if k in elements_in_data:
-                im.axes.text(v[1]-1, v[0]-1, k, c=c, **kw)
-            else:
-                im.axes.text(v[1]-1, v[0]-1, k, c=c, alpha=0.6, **kw)
+            im.axes.text(v[1]-1, v[0]-1, k, c=c, alpha=0.6, **kw)
         #  path_effects=[patheffects.withStroke(linewidth=3, foreground='white')], 
                      
         rect = matplotlib.patches.Rectangle(xy=(v[1]-1.5, v[0]-1.5), width=1, height=1, 
