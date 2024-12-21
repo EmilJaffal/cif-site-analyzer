@@ -1,0 +1,168 @@
+##############################################################################
+#                                                                            #
+# Al-Bi-Ca-La      # Ca13.90La0.10AlBi11                           # 1054332 #
+#                                                                            #
+##############################################################################
+#                                                                            #
+#                           Pearson's Crystal Data                           #
+#      Crystal Structure Database for Inorganic Compounds (on DVD)           #
+#                              Release 2024/25                               #
+#      Editors: Pierre Villars, Karin Cenzual, and Vitaliy Dubenskyy         #
+#                                                                            #
+#   Copyright (c) ASM International & Material Phases Data System (MPDS),    #
+# Switzerland & National Institute for Materials Science (NIMS), Japan, 2024 #
+#                   All rights reserved. Version 2024.07                     #
+#                                                                            #
+#   This copy of Pearson's Crystal Data is licensed to:                      #
+#   Hunter College - City University of New York                             #
+#                                                                            #
+##############################################################################
+
+data_1054332
+_audit_creation_date                     2024-09-25
+_audit_creation_method
+;
+Pearson's Crystal Data browser
+;
+#_database_code_PCD                      1054332
+_database_code_PDF                       04-028-2545
+
+# Entry summary
+
+_chemical_formula_structural             'Ca~13.90~ La~0.10~ Al Bi~11~'
+_chemical_formula_sum                    'Al Bi11 Ca13.90 La0.10'
+_chemical_name_mineral                   ?
+_chemical_compound_source                ?
+_chemical_name_structure_type            Ca~14~AlSb~11~,tI208,142
+_chemical_formula_weight                 2896.7
+
+# Bibliographic data
+
+_publ_section_title
+;
+Caught in action. The late rare earths thulium and lutetium substituting aluminum atoms in the structure of Ca~14~AlBi~11~
+;
+_journal_coden_ASTM                      JACSAT
+_journal_name_full                       'J. Am. Chem. Soc.'
+_journal_year                            2021
+_journal_volume                          143
+_journal_page_first                      65
+_journal_page_last                       68
+_journal_language                        English
+loop_
+ _publ_author_name
+ _publ_author_address
+'Baranets S.'
+;
+Delaware University (UD)
+Department of Chemistry and Biochemistry
+Newark
+U.S.A. Delaware
+;
+'Bobev S.'
+;
+Delaware University (UD)
+Department of Chemistry and Biochemistry
+Newark
+U.S.A. Delaware
+;
+
+# Standardized crystallographic data
+
+_cell_length_a                           17.029
+_cell_length_b                           17.029
+_cell_length_c                           22.689
+_cell_angle_alpha                        90
+_cell_angle_beta                         90
+_cell_angle_gamma                        90
+_cell_volume                             6579.5
+_cell_formula_units_Z                    8
+_space_group_IT_number                   142
+_space_group_name_H-M_alt                'I 41/a c d (origin choice 2)'
+loop_
+ _space_group_symop_id
+ _space_group_symop_operation_xyz
+ 1 'x, y, z'
+ 2 '1/2-x, y, -z'
+ 3 '-x, 1/2-y, z'
+ 4 '-x, -y, -z'
+ 5 '-x, y, 1/2+z'
+ 6 '1/4-y, 1/4-x, 1/4-z'
+ 7 '1/4-y, -1/4-x, -1/4+z'
+ 8 '1/4-y, -1/4+x, 1/4+z'
+ 9 '-1/4-y, -1/4+x, 1/4-z'
+ 10 '1/2+x, -y, z'
+ 11 'x, -y, 1/2-z'
+ 12 'x, 1/2+y, -z'
+ 13 '1/4+y, 1/4-x, -1/4+z'
+ 14 '-1/4+y, 1/4-x, -1/4-z'
+ 15 '-1/4+y, 1/4+x, 1/4-z'
+ 16 '-1/4+y, -1/4+x, -1/4+z'
+ 17 '1/2+x, 1/2+y, 1/2+z'
+ 18 '1-x, 1/2+y, 1/2-z'
+ 19 '1/2-x, 1-y, 1/2+z'
+ 20 '1/2-x, 1/2-y, 1/2-z'
+ 21 '1/2-x, 1/2+y, 1+z'
+ 22 '3/4-y, 3/4-x, 3/4-z'
+ 23 '3/4-y, 1/4-x, 1/4+z'
+ 24 '3/4-y, 1/4+x, 3/4+z'
+ 25 '1/4-y, 1/4+x, 3/4-z'
+ 26 '1+x, 1/2-y, 1/2+z'
+ 27 '1/2+x, 1/2-y, 1-z'
+ 28 '1/2+x, 1+y, 1/2-z'
+ 29 '3/4+y, 3/4-x, 1/4+z'
+ 30 '1/4+y, 3/4-x, 1/4-z'
+ 31 '1/4+y, 3/4+x, 3/4-z'
+ 32 '1/4+y, 1/4+x, 1/4+z'
+loop_
+ _atom_type_symbol
+ Ca
+ La
+ Bi
+ Al
+loop_
+ _atom_site_label
+ _atom_site_type_symbol
+ _atom_site_symmetry_multiplicity
+ _atom_site_Wyckoff_symbol
+ _atom_site_fract_x
+ _atom_site_fract_y
+ _atom_site_fract_z
+ _atom_site_occupancy
+ Ca,La2A Ca 32 g 0.02385 0.3782 0.00542 0.975(4)
+ Ca,La2B La 32 g 0.02385 0.3782 0.00542 0.025(4)
+ Ca1 Ca 32 g 0.04147 0.07422 0.17067 1
+ Bi3 Bi 32 g 0.13004 0.02711 0.0472 1
+ Ca4 Ca 32 g 0.34017 0.07146 0.0919 1
+ Bi2 Bi 32 g 0.3601 0.25569 0.05904 1
+ Bi1 Bi 16 f 0.13855 0.38855 0.125 1
+ Ca3 Ca 16 e 0.35208 0 0.25 1
+ Bi4 Bi 8 b 0 0.25 0.125 1
+ Al1 Al 8 a 0 0.25 0.375 1
+
+
+_exptl_crystal_colour                    ?
+_exptl_crystal_density_meas              ?
+_exptl_crystal_density_diffrn            5.85
+_cell_measurement_temperature            200.01
+_cell_measurement_radiation              'X-rays, Mo Ka'
+_cell_measurement_wavelength             0.71073
+_cell_measurement_reflns_used            2749
+_diffrn_ambient_temperature              200.01
+_diffrn_measurement_device               'automatic diffractometer'
+_diffrn_measurement_device_type          'Bruker AXS APEX DUO'
+_diffrn_radiation_type                   'X-rays, Mo Ka'
+_diffrn_radiation_wavelength             0.71073
+_diffrn_reflns_number                    40911
+_diffrn_reflns_theta_min                 2.393
+_diffrn_reflns_theta_max                 29.744
+_exptl_absorpt_coefficient_mu            60.915
+_exptl_absorpt_correction_type           yes
+_computing_structure_solution            'direct methods'
+_refine_ls_number_parameters             63
+_refine_ls_number_reflns                 1885
+_refine_ls_R_factor_gt                   0.0305
+_refine_ls_wR_factor_gt                  0.0640
+
+# End of data set 1054332
+

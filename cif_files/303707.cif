@@ -1,0 +1,152 @@
+##############################################################################
+#                                                                            #
+# Al-Ba-Sb         # Ba14Al0.96Sb11.04                             #  303707 #
+#                                                                            #
+##############################################################################
+#                                                                            #
+#                           Pearson's Crystal Data                           #
+#      Crystal Structure Database for Inorganic Compounds (on DVD)           #
+#                              Release 2024/25                               #
+#      Editors: Pierre Villars, Karin Cenzual, and Vitaliy Dubenskyy         #
+#                                                                            #
+#   Copyright (c) ASM International & Material Phases Data System (MPDS),    #
+# Switzerland & National Institute for Materials Science (NIMS), Japan, 2024 #
+#                   All rights reserved. Version 2024.07                     #
+#                                                                            #
+#   This copy of Pearson's Crystal Data is licensed to:                      #
+#   Hunter College - City University of New York                             #
+#                                                                            #
+##############################################################################
+
+data_303707
+_audit_creation_date                     2024-09-18
+_audit_creation_method
+;
+Pearson's Crystal Data browser
+;
+#_database_code_PCD                      303707
+_database_code_PDF                       04-008-9009
+
+# Entry summary
+
+_chemical_formula_structural             'Ba~14~ Al~0.96~ Sb~11.04~'
+_chemical_formula_sum                    'Al0.96 Ba14 Sb11.04'
+_chemical_name_mineral                   ?
+_chemical_compound_source                ?
+_chemical_name_structure_type            Ca~14~AlSb~11~,tI208,142
+_chemical_formula_weight                 3292.6
+
+# Bibliographic data
+
+_publ_section_title
+'Synthesis, structure, and properties of A~14~AlSb~11~ (A= Ca, Sr, Ba)'       
+_journal_coden_ASTM                      JSSCBI
+_journal_name_full                       'J. Solid State Chem.'
+_journal_year                            1993
+_journal_volume                          107
+_journal_page_first                      513
+_journal_page_last                       523
+_journal_language                        English
+loop_
+ _publ_author_name
+ _publ_author_address
+''
+;
+;
+
+# Standardized crystallographic data
+
+_cell_length_a                           18.293
+_cell_length_b                           18.293
+_cell_length_c                           24.222
+_cell_angle_alpha                        90
+_cell_angle_beta                         90
+_cell_angle_gamma                        90
+_cell_volume                             8105.5
+_cell_formula_units_Z                    8
+_space_group_IT_number                   142
+_space_group_name_H-M_alt                'I 41/a c d (origin choice 2)'
+loop_
+ _space_group_symop_id
+ _space_group_symop_operation_xyz
+ 1 'x, y, z'
+ 2 '1/2-x, y, -z'
+ 3 '-x, 1/2-y, z'
+ 4 '-x, -y, -z'
+ 5 '-x, y, 1/2+z'
+ 6 '1/4-y, 1/4-x, 1/4-z'
+ 7 '1/4-y, -1/4-x, -1/4+z'
+ 8 '1/4-y, -1/4+x, 1/4+z'
+ 9 '-1/4-y, -1/4+x, 1/4-z'
+ 10 '1/2+x, -y, z'
+ 11 'x, -y, 1/2-z'
+ 12 'x, 1/2+y, -z'
+ 13 '1/4+y, 1/4-x, -1/4+z'
+ 14 '-1/4+y, 1/4-x, -1/4-z'
+ 15 '-1/4+y, 1/4+x, 1/4-z'
+ 16 '-1/4+y, -1/4+x, -1/4+z'
+ 17 '1/2+x, 1/2+y, 1/2+z'
+ 18 '1-x, 1/2+y, 1/2-z'
+ 19 '1/2-x, 1-y, 1/2+z'
+ 20 '1/2-x, 1/2-y, 1/2-z'
+ 21 '1/2-x, 1/2+y, 1+z'
+ 22 '3/4-y, 3/4-x, 3/4-z'
+ 23 '3/4-y, 1/4-x, 1/4+z'
+ 24 '3/4-y, 1/4+x, 3/4+z'
+ 25 '1/4-y, 1/4+x, 3/4-z'
+ 26 '1+x, 1/2-y, 1/2+z'
+ 27 '1/2+x, 1/2-y, 1-z'
+ 28 '1/2+x, 1+y, 1/2-z'
+ 29 '3/4+y, 3/4-x, 1/4+z'
+ 30 '1/4+y, 3/4-x, 1/4-z'
+ 31 '1/4+y, 3/4+x, 3/4-z'
+ 32 '1/4+y, 1/4+x, 1/4+z'
+loop_
+ _atom_type_symbol
+ Ba
+ Sb
+ Al
+loop_
+ _atom_site_label
+ _atom_site_type_symbol
+ _atom_site_symmetry_multiplicity
+ _atom_site_Wyckoff_symbol
+ _atom_site_fract_x
+ _atom_site_fract_y
+ _atom_site_fract_z
+ _atom_site_occupancy
+Ba(2) Ba 32 g 0.0201 0.37627 0.00064 1
+Ba(1) Ba 32 g 0.04465 0.07135 0.17142 1
+Sb(3) Sb 32 g 0.13269 0.02501 0.04657 1
+Ba(4) Ba 32 g 0.34192 0.06806 0.09348 1
+Sb(2) Sb 32 g 0.36897 0.25243 0.06537 1
+Sb(1) Sb 16 f 0.13025 0.38025 0.125 1
+Ba(3) Ba 16 e 0.35659 0 0.25 1
+Sb(4) Sb 8 b 0 0.25 0.125 1
+AlM1 Al 8 a 0 0.25 0.375 0.96
+SbM2 Sb 8 a 0 0.25 0.375 0.04
+
+
+_exptl_crystal_colour                    black
+_exptl_crystal_density_meas              ?
+_exptl_crystal_density_diffrn            5.40
+_cell_measurement_temperature            130
+_cell_measurement_radiation              'X-rays, Mo Ka'
+_cell_measurement_wavelength             0.71069
+_cell_measurement_reflns_used            ?
+_diffrn_ambient_temperature              130
+_diffrn_measurement_device               'automatic diffractometer'
+_diffrn_measurement_device_type          'Syntex P21'
+_diffrn_radiation_type                   'X-rays, Mo Ka'
+_diffrn_radiation_wavelength             0.71069
+_diffrn_reflns_number                    5064
+_exptl_absorpt_coefficient_mu            20.568
+_exptl_absorpt_correction_type           ?
+_computing_structure_solution            'direct methods'
+_refine_ls_number_parameters             61
+_refine_ls_number_reflns                 2020
+_refine_ls_R_factor_gt                   0.0371
+_refine_ls_wR_factor_gt                  0.0437
+
+# End of data set 303707
+

@@ -502,7 +502,7 @@ if __name__ == "__main__":
             
         valid_input = False
         while not valid_input:
-            res = input("Please enter the number corresponding to the selected strcuture type: \n")
+            res = input("Please enter the number corresponding to the selected structure type: \n")
             try:
                 res = int(res)
                 assert res <= len(stypes)
