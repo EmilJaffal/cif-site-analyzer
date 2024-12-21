@@ -42,7 +42,6 @@ No  Count Structure type
 (1) 19    CuTi,tP4,129
 (2) 5     Ca14AlSb11,tI208,142
 Please enter the number corresponding to the selected structure type: 
-
 ```
 
 You may then choose to process whichever structure type you would like, and it will process the sites.
