@@ -1,6 +1,6 @@
 # Site-Analysis
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/bobleesj/cifkit/blob/main/LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/emiljaffal/Site-Analysis/blob/main/LICENSE)
 ![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)
 
 This script parses .cif files based on structure type and creates a CSV table with site compositions, and heat maps for each site (up to 5 sites) and a heat map for compositions. Run the create_occu_table_and_heatmaps.py file with the path of the folder containing CIFs belonging to the same structure type as argument.
@@ -11,7 +11,7 @@ This script parses .cif files based on structure type and creates a CSV table wi
 
 The code is designed for interactive use without the need to write any code.
 
-![SA-demo-gif](https://github.com/EmilJaffal/Site-Analysis/assets/siteanalysis_DEMO.gif)
+![SA-demo-gif](https://github.com/EmilJaffal/Site-Analysis/blob/main/assets/siteanalysis_DEMO.gif)
 
 ## Scope
 
@@ -80,16 +80,16 @@ Filename	Formula	Notes	Num Elements	2c1	2c2
 
 Periodic table heat maps showing element distribution of the overall structure type in your folder
 
-![SA-heatmap](https://github.com/EmilJaffal/Site-Analysis/assets/ElemDist_CuTi-tP4.png)
+![SA-heatmap](https://github.com/EmilJaffal/Site-Analysis/blob/main/ElemDist_CuTi-tP4.png)
 
 and element distribution of sites 
 
-![SA-site-heatmap](https://github.com/EmilJaffal/Site-Analysis/assets/ElemDist_CuTi-tP4_2c(1).png)
+![SA-site-heatmap](https://github.com/EmilJaffal/Site-Analysis/blob/main/ElemDist_CuTi-tP4_2c(1).png)
 
 ## Installation
 
 ```text
-git clone https://github.com/bobleesj/cif-bond-analyzer.git
+git clone https://github.com/emiljaffal/site-analysis.git
 cd cif-bond-analyzer
 pip install -r requirements.txt
 python main.py
