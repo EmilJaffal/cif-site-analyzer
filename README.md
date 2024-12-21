@@ -29,16 +29,7 @@ $ python main.py [name].csv [cif_folder_name]
 ```
 
 Once the code is executed using `python main.py`, the following prompt will
-appear, asking you to choose one of the three analysis options:
-
-```text
-Welcome! Please choose an option to proceed:
-[1] Conduct site analysis.
-[2] Conduct system analysis.
-[3] Conduct coordination analysis.
-Enter your choice (1-3): 1
-```
-When a structure type has more than 5 sites, a prompt will be given to select the sites for further analysis. For any option, SA will ask you to choose a structure type from the folder containing `.cif` files:
+appear, asking you to choose one of the available structure types:
 
 ```text
 
@@ -56,7 +47,9 @@ Please enter the number corresponding to the selected structure type:
 
 You may then choose to process whichever structure type you would like, and it will process the sites.
 
-#### Output 1.1 Excel and JSON
+When a structure type has more than 5 sites, a prompt will be given to select the sites for further analysis. For any option, SA will ask you to choose a structure type from the folder containing `.cif` files:
+
+#### Output 1 CSV
 
 Data for each folder is saved in `[structuretype].csv`. Below is an example of a .csv of your structure type containing: filename, formula, notes (synthesis conditions), # of elements and site occupations.
 
@@ -76,7 +69,7 @@ Filename	Formula	Notes	Num Elements	2c1	2c2
 1010265.cif	CuTi	tet1	2	Ti	Cu
 ```
 
-#### Output 1.2 heatmap
+#### Output 2 Heatmaps
 
 Periodic table heat maps showing element distribution of the overall structure type in your folder
 
@@ -88,11 +81,11 @@ and element distribution of sites
 
 ## Installation
 
-```text
-git clone https://github.com/emiljaffal/site-analysis.git
-cd cif-bond-analyzer
-pip install -r requirements.txt
-python main.py
+```bash
+$ git clone https://github.com/EmilJaffal/Site-Analysis
+$ cd Site-Analysis
+$ pip install -r requirements.txt
+$ python main.py [name].csv [cif_folder_name]
 ```
 
 ## Contributors
