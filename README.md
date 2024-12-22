@@ -67,6 +67,7 @@ Please enter the numbers corresponding to the selected sites:
 #### Output 1 - .csv
 
 Data for each folder is saved in `[structuretype].csv`. Below is an example of a .csv of your structure type containing: filename, formula, notes (synthesis conditions), # of elements and site occupations.
+The first row shows the average coordinates of the sites along with the associated standard deviation for all the files processed with the selected structure type.  
 
 You can find an example of our test set here: [SA-csv](https://github.com/EmilJaffal/Site-Analysis/blob/main/CuTi-tP4.csv)
 
