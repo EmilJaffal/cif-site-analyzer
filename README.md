@@ -1,4 +1,4 @@
-# CIF Site-Analysis
+# CIF Site Analysis
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/emiljaffal/Site-Analysis/blob/main/LICENSE)
 ![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)
