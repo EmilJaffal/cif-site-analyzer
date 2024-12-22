@@ -22,9 +22,6 @@ def cif_to_dict(path: str) -> dict:
         print(f"File {path} not found!")
         return
     
-    # now this will only read formula and coordinates
-    # TODO: write a full parser
-    
     attributes_to_read = [
         '_chemical_formula_structural',
         '_chemical_formula_sum',
@@ -332,16 +329,24 @@ def get_site_element_dist(dataframe: pd.DataFrame, site: str = None) -> pd.DataF
     return element_stats
 
 
+def format_wyckoff_site_label(site_label, italisize=False):
+    ws = [v for v in re.split(r'\d+', site_label) if v !=''][0]
+    nums = [s for s in site_label.split(ws) if s != ""]
+    if italisize:
+        site_label = nums[0] + f'${ws}$'
+    else:
+        site_label = nums[0] + f'{ws}'
+    if len(nums) > 1:
+        site_label += f" ({''.join(nums[1:])})"
+    return site_label
+
+
 def ptable_heatmap_mpl(vals_dict: dict, site: str, stype: str, cmap: str):
     
     # format site
     elements_in_data = list(vals_dict.keys())
     if site is not None:
-        ws = [v for v in re.split(r'\d+', site) if v !=''][0]
-        nums = [s for s in site.split(ws) if s != ""]
-        site = nums[0] + f'${ws}$'
-        if len(nums) > 1:
-            site += f" ({''.join(nums[1:])})"
+        site = format_wyckoff_site_label(site, italisize=True)
     
     elements = {'H': [1, 1], 'He': [1, 18], 'Li': [2, 1], 'Be': [2, 2], 'B': [2, 13], 'C': [2, 14], 'N': [2, 15], 'O': [2, 16], 'F': [2, 17], 'Ne': [2, 18], 
                 'Na': [3, 1], 'Mg': [3, 2], 'Al': [3, 13], 'Si': [3, 14], 'P': [3, 15], 'S': [3, 16], 'Cl': [3, 17], 'Ar': [3, 18], 'K': [4, 1], 'Ca': [4, 2], 
@@ -478,6 +483,7 @@ if __name__ == "__main__":
             cif_filenames.append(line)
 
     # read cif and get formula and structure type
+    # TODO: read cif only once
     cif_file_data = []
     for cif_name in cif_filenames:
         cif_path = os.path.join(root, cif_name)
@@ -492,6 +498,8 @@ if __name__ == "__main__":
     
     cif_file_data = pd.DataFrame(cif_file_data)
     stypes = cif_file_data['Structure type'].value_counts()
+    
+    # Get user input for structure type
     if len(stypes) > 1: 
         print("More than one structure types are fould in the input list.")
         print("Please select one structure type form the list below.")
@@ -502,7 +510,7 @@ if __name__ == "__main__":
             
         valid_input = False
         while not valid_input:
-            res = input("Please enter the number corresponding to the selected structure type: \n")
+            res = input("Please enter the number corresponding to the selected strcuture type: \n")
             try:
                 res = int(res)
                 assert res <= len(stypes)
@@ -521,6 +529,7 @@ if __name__ == "__main__":
     all_sites = sorted(all_sites, key=lambda k: int(re.split('[a-z]', k)[0]))
     all_sites = sorted(all_sites, key=lambda k: get_ws(k))
     
+    # Get user input for sites
     if len(all_sites) > 5:
         print(f"There are {len(all_sites)} sites present for this structure type.")
         print("Please select a maximum of five sites from the the list below.")
@@ -545,8 +554,8 @@ if __name__ == "__main__":
     else:
         sites = all_sites
 
+    # collect data from cifs
     data = []
-    
     pos_data = dict(zip(all_sites, [[] for _ in range(len(data0)-2)]))
 
     for i in selected_entries:
@@ -567,18 +576,26 @@ if __name__ == "__main__":
             else:
                 avg_positions += " "
         pos_row[k] = avg_positions
-    data.insert(0, pos_row)
-                
+    data.insert(0, pos_row)      
     data = pd.DataFrame(data)
     
+    # Format site names for writing csv
     columns = [c for c in data.columns if c not in all_sites]
-    columns.extend(all_sites)
+    formatted_site_names = {}
+    for cname in all_sites:
+        new_name = format_wyckoff_site_label(cname)
+        formatted_site_names[cname] = new_name
+        columns.append(new_name)
+        
+    data.rename(columns=formatted_site_names, inplace=True)
     data[columns].to_csv(f"{'-'.join(selected_stype.split(',')[:2])}.csv", index=False)
+    data.rename(columns=dict(zip(formatted_site_names.values(), formatted_site_names.keys())), inplace=True)
+    
+    # Plot site heatmaps
     cmaps = ["Reds", "Blues", "Greens", "Purples", "Oranges"]
     for i, site in enumerate(sites):
         print(f"Processing {site}")
         ptable_heatmap_mpl(vals_dict=get_site_element_dist(data, site), site=site, stype=selected_stype, cmap=cmaps[i])
-        # break
     
-    # Cumulative
+    # Cumulative heatmap
     ptable_heatmap_mpl(vals_dict=get_site_element_dist(data.iloc[1:], site=None), site=None, stype=selected_stype, cmap="Greys")
