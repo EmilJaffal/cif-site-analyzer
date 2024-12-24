@@ -93,8 +93,8 @@ $ python main.py [name].csv [cif_folder_name]
 ## Contributors
 
 - Anton Oliynyk
-- Balaranjan Selvaratnam
-- Emil Jaffal
+- [Balaranjan Selvaratnam](https://github.com/balaranjan)
+- [Emil Jaffal](https://github.com/EmilJaffal)
 
 ## How to ask for help
 
