@@ -423,9 +423,9 @@ def ptable_heatmap_mpl(vals_dict: dict, site: str, stype: str, cmap: str):
     
     # compose title and wrap
     if site is not None:
-        text_str = f"element distribution of {site} site in {stype.split(',')[0]}-type compounds"
+        text_str = f"element distribution of {site} site in {format_formula(stype.split(',')[0])}-type compounds"
     else:
-        text_str = f"element distribution in {stype.split(',')[0]}-type compounds"
+        text_str = f"element distribution in {format_formula(stype.split(',')[0])}-type compounds"
     words = text_str.split()
     wrapped_text = ""
     line = ""
@@ -464,6 +464,22 @@ def ptable_heatmap_mpl(vals_dict: dict, site: str, stype: str, cmap: str):
 def get_ws(s):
     s = re.split(r'\d', s)
     return [_s for _s in s if _s != ''][0]
+
+
+def format_formula(formula):
+    formula = _parse_formula(formula)
+    
+    new_formula = ""
+    for k, v in formula.items():
+        if v == 1.0:
+            new_formula += k
+        else:
+            if abs(int(v) - v) < 1e-3:
+                new_formula += k + "$_{%s}$" % int(v)
+            else:
+                new_formula += k + "$_{%s}$" % v
+    
+    return new_formula
 
 
 if __name__ == "__main__":
