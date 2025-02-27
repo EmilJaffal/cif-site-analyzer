@@ -366,7 +366,8 @@ def ptable_heatmap_mpl(vals_dict: dict, site: str, stype: str, cmap: str):
         pmask[p-1, g-1] = 1
     
     min_value = min(vals_dict.values())
-    norm_const = max(vals_dict.values()) - min_value
+    norm_const = max(max(vals_dict.values()) - min_value, min_value)
+            
     heat_map = np.full(shape=(9, 18), fill_value=-(min_value))
     for k, v in elements.items():
         if k in vals_dict:
@@ -403,6 +404,7 @@ def ptable_heatmap_mpl(vals_dict: dict, site: str, stype: str, cmap: str):
     im.axes.text(2, 5.1, '*', alpha=0.6, **kw)
     im.axes.text(2, 7.1, '*', alpha=0.6, **kw)
     for k, v in elements.items():
+
         c = 'w' if ((vals_dict[k] - min_value) / norm_const) > 0.6 else 'k'
         if k in elements_in_data:
             im.axes.text(v[1]-1, v[0]-1, k, c=c, **kw)
@@ -514,6 +516,11 @@ if __name__ == "__main__":
     
     cif_file_data = pd.DataFrame(cif_file_data)
     stypes = cif_file_data['Structure type'].value_counts()
+    stypes = stypes[stypes > 1]
+    
+    if not len(stypes):
+        print(f"No structure type has more than one cif in the provided list.")
+        exit(0)
     
     # Get user input for structure type
     if len(stypes) > 1: 
@@ -547,8 +554,8 @@ if __name__ == "__main__":
     
     # Get user input for sites
     if len(all_sites) > 5:
-        print(f"There are {len(all_sites)} sites present for this structure type.")
-        print("Please select a maximum of five sites from the the list below.")
+        print(f"\nThere are {len(all_sites)} sites present for this structure type.")
+        print("Please select the sites from the the list below.")
         print("Enter the numbers separated by space. e.g. 1 3 4 6")
         
         print("\nNo Site")
@@ -557,13 +564,18 @@ if __name__ == "__main__":
 
         valid_input = False
         while not valid_input:
-            res = input("Please enter the numbers corresponding to the selected sites: \n")
+            res = input("\nEnter 0 to plot all sites or enter the numbers corresponding to the selected sites: \n")
             try:
                 res = res.replace(',', ' ')
                 res = [int(r) for r in res.split()]
-                assert np.all(np.array(res) <= len(all_sites))
-                sites = [all_sites[i-1] for i in res]
-                valid_input = True
+                if not 0 in res:
+                    assert np.all(np.array(res) <= len(all_sites))
+                    sites = [all_sites[i-1] for i in res]
+                    valid_input = True
+                else:
+                    valid_input = True
+                    print("Plotting all sites.")
+                    sites = all_sites
             except Exception as e:
                 print(e)
                 print("Invalid input. Try again.")
@@ -608,10 +620,12 @@ if __name__ == "__main__":
     data.rename(columns=dict(zip(formatted_site_names.values(), formatted_site_names.keys())), inplace=True)
     
     # Plot site heatmaps
-    cmaps = ["Reds", "Blues", "Greens", "Purples", "Oranges"]
+    cmaps = ["Reds", "Blues", "Greens", "Purples", "Oranges", "YlOrBr", "OrRd", "PuRd", "RdPu", "BuPu", "GnBu",
+             "PuBu", "YlGnBu", "PuBuGn", "BuGn", "YlGn", "viridis", "plasma", "inferno", "magma", "cividis"]
+    
     for i, site in enumerate(sites):
         print(f"Processing {site}")
-        ptable_heatmap_mpl(vals_dict=get_site_element_dist(data, site), site=site, stype=selected_stype, cmap=cmaps[i])
+        ptable_heatmap_mpl(vals_dict=get_site_element_dist(data, site), site=site, stype=selected_stype, cmap=cmaps[i % len(cmaps)])
     
     # Cumulative heatmap
-    ptable_heatmap_mpl(vals_dict=get_site_element_dist(data.iloc[1:], site=None), site=None, stype=selected_stype, cmap="Greys")
+    ptable_heatmap_mpl(vals_dict=get_site_element_dist(data, site=None), site=None, stype=selected_stype, cmap="Greys")
