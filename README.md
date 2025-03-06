@@ -92,9 +92,9 @@ $ python main.py [name].csv [cif_folder_name]
 
 ## Contributors
 
-- Anton Oliynyk
 - [Balaranjan Selvaratnam](https://github.com/balaranjan)
 - [Emil Jaffal](https://github.com/EmilJaffal)
+- Anton Oliynyk
 
 ## How to ask for help
 

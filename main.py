@@ -470,7 +470,7 @@ if __name__ == "__main__":
     
     input_cifs = []
     if len(sys.argv) != 3:
-        print("This script requires \n\t(i) file contatining names of cif files to process, and \n\t(ii) path to the folder contating .cif files.")
+        print("This script requires \n\t(i) file containing names of cif files to process, and \n\t(ii) path to the folder containing .cif files.")
         exit(0)
     
     cif_filenames = []
