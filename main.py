@@ -45,12 +45,12 @@ def cif_to_dict(path: str) -> dict:
         lines = f.readlines()
         
         # read conditions, if any
-        conds = lines[2].replace('#', "").lstrip().split()
-        if len(conds) > 3:
-            conds = conds[2]
+        conditions = lines[2].replace('#', "").lstrip().split()
+        if len(conditions) > 3:
+            conditions = conditions[2]
         else:
-            conds = ""
-        data['conditions'] = conds
+            conditions = ""
+        data['conditions'] = conditions
         ln = 0
         while ln < len(lines):
             line = lines[ln].lstrip()
@@ -93,7 +93,7 @@ def cif_to_dict(path: str) -> dict:
     
     
 def format_cif_data(cif_data: dict) -> dict:
-    numeric_arribs = [
+    numeric_attributes = [
         '_chemical_formula_weight'
         '_cell_length_a ',
         '_cell_length_b',
@@ -107,7 +107,7 @@ def format_cif_data(cif_data: dict) -> dict:
         # '#_database_code_PCD',
         ]
     
-    for k in numeric_arribs:
+    for k in numeric_attributes:
         if k in cif_data:
             if k in ['_cell_formula_units_Z', '_space_group_IT_number', 
                     #  '#_database_code_PCD'
@@ -119,14 +119,14 @@ def format_cif_data(cif_data: dict) -> dict:
             else:
                 cif_data[k] = float(cif_data[k][0])
     
-    string_arribs = [
+    string_attributes = [
         '_chemical_formula_sum',
         '_chemical_name_structure_type',
         '_space_group_name_H-M_alt',
         'conditions'
         ]
     
-    for k in string_arribs:
+    for k in string_attributes:
         if k in cif_data:
             if isinstance(cif_data[k], list):
                 cif_data[k] = ''.join(cif_data[k]).replace("'", '').replace("~", "")
@@ -329,10 +329,10 @@ def get_site_element_dist(dataframe: pd.DataFrame, site: str = None) -> pd.DataF
     return element_stats
 
 
-def format_wyckoff_site_label(site_label, italisize=False):
+def format_wyckoff_site_label(site_label, italicize=False):
     ws = [v for v in re.split(r'\d+', site_label) if v !=''][0]
     nums = [s for s in site_label.split(ws) if s != ""]
-    if italisize:
+    if italicize:
         site_label = nums[0] + f'${ws}$'
     else:
         site_label = nums[0] + f'{ws}'
@@ -346,7 +346,7 @@ def ptable_heatmap_mpl(vals_dict: dict, site: str, stype: str, cmap: str):
     # format site
     elements_in_data = list(vals_dict.keys())
     if site is not None:
-        site = format_wyckoff_site_label(site, italisize=True)
+        site = format_wyckoff_site_label(site, italicize=True)
     
     elements = {'H': [1, 1], 'He': [1, 18], 'Li': [2, 1], 'Be': [2, 2], 'B': [2, 13], 'C': [2, 14], 'N': [2, 15], 'O': [2, 16], 'F': [2, 17], 'Ne': [2, 18], 
                 'Na': [3, 1], 'Mg': [3, 2], 'Al': [3, 13], 'Si': [3, 14], 'P': [3, 15], 'S': [3, 16], 'Cl': [3, 17], 'Ar': [3, 18], 'K': [4, 1], 'Ca': [4, 2], 
@@ -493,9 +493,9 @@ if __name__ == "__main__":
     
     cif_filenames = []
     root = sys.argv[2]
-    with open(sys.argv[1], 'r') as f:
+    with open(sys.argv[1], 'r', encoding='utf-8-sig') as f:
         for line in f.readlines():
-            line = line.replace('\n', "")
+            line = line.replace('\n', "").strip()
             if not line.endswith('.cif'):
                 line += '.cif'
             cif_filenames.append(line)
@@ -512,7 +512,7 @@ if __name__ == "__main__":
             cif_file_data.append({'Filename': cif_name, 'Formula': formula, 'Structure type': stype})
         except Exception as e:
             print(f"Error reading {cif_path} file.")
-            # print(e)
+            print(e)
     
     cif_file_data = pd.DataFrame(cif_file_data)
     stypes = cif_file_data['Structure type'].value_counts()
@@ -523,8 +523,8 @@ if __name__ == "__main__":
         exit(0)
     
     # Get user input for structure type
-    if len(stypes) > 1: 
-        print("More than one structure types are fould in the input list.")
+    if len(stypes) > 1:  
+        print("More than one structure types are found in the input list.")
         print("Please select one structure type form the list below.")
 
         print(f"\nNo  {'Count':<5} Structure type")
