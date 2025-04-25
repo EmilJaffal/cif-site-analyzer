@@ -360,7 +360,7 @@ def ptable_heatmap_mpl(vals_dict: dict, site: str, stype: str, cmap: str, title=
                 'Np': [9, 8], 'Pu': [9, 9], 'Am': [9, 10], 'Cm': [9, 11], 'Bk': [9, 12], 'Cf': [9, 13], 'Es': [9, 14], 'Fm': [9, 15], 'Md': [9, 16], 'No': [9, 17],
                 'Lr': [9, 18]}
     
-    pmask = np.zeros(shape=(9, 18))
+    pmask = np.zeros(shape=(9, 18), dtype=float)
     for k, v in elements.items():
         p, g = v
         pmask[p-1, g-1] = 1
@@ -368,7 +368,7 @@ def ptable_heatmap_mpl(vals_dict: dict, site: str, stype: str, cmap: str, title=
     min_value = min(vals_dict.values())
     norm_const = max(max(vals_dict.values()) - min_value, min_value)
             
-    heat_map = np.full(shape=(9, 18), fill_value=-(min_value))
+    heat_map = np.full(shape=(9, 18), fill_value=-(min_value), dtype=float)
     for k, v in elements.items():
         if k in vals_dict:
             heat_map[v[0]-1, v[1]-1] = vals_dict[k]
@@ -405,7 +405,7 @@ def ptable_heatmap_mpl(vals_dict: dict, site: str, stype: str, cmap: str, title=
     im.axes.text(2, 7.1, '*', alpha=0.6, **kw)
     for k, v in elements.items():
 
-        c = 'w' if ((vals_dict[k] - min_value) / norm_const) > 0.6 else 'k'
+        c = 'w' if ((vals_dict.get(k, 0) - min_value) / norm_const) > 0.6 else 'k'
         if k in elements_in_data:
             im.axes.text(v[1]-1, v[0]-1, k, c=c, **kw)
         else:
