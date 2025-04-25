@@ -341,7 +341,7 @@ def format_wyckoff_site_label(site_label, italicize=False):
     return site_label
 
 
-def ptable_heatmap_mpl(vals_dict: dict, site: str, stype: str, cmap: str):
+def ptable_heatmap_mpl(vals_dict: dict, site: str, stype: str, cmap: str, title=None):
     
     # format site
     elements_in_data = list(vals_dict.keys())
@@ -427,7 +427,10 @@ def ptable_heatmap_mpl(vals_dict: dict, site: str, stype: str, cmap: str):
     if site is not None:
         text_str = f"element distribution of {site} site in {format_formula(stype.split(',')[0])}-type compounds"
     else:
-        text_str = f"element distribution in {format_formula(stype.split(',')[0])}-type compounds"
+        if title is not None:
+            text_str = title
+        else:
+            text_str = f"element distribution in {format_formula(stype.split(',')[0])}-type compounds"
     words = text_str.split()
     wrapped_text = ""
     line = ""
@@ -456,11 +459,14 @@ def ptable_heatmap_mpl(vals_dict: dict, site: str, stype: str, cmap: str):
     ax.spines['bottom'].set_visible(False)
     ax.spines['left'].set_visible(False)
     
-    stype = '-'.join(stype.split(',')[:2])
-    if site is not None:
-        plt.savefig(f"ElemDist_{stype}_{site.replace('$', '').replace(' ', '')}.png", dpi=300)
+    if title is None:
+        filename = '-'.join(stype.split(',')[:2])
     else:
-        plt.savefig(f"ElemDist_{stype}.png", dpi=300)
+        filename = title
+    if site is not None:
+        plt.savefig(f"ElemDist_{filename}_{site.replace('$', '').replace(' ', '')}.png", dpi=300)
+    else:
+        plt.savefig(f"ElemDist_{filename}.png", dpi=300)
         
 
 def get_ws(s):
