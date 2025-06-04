@@ -45,12 +45,12 @@ def cif_to_dict(path: str) -> dict:
         lines = f.readlines()
         
         # read conditions, if any
-        conds = lines[2].replace('#', "").lstrip().split()
-        if len(conds) > 3:
-            conds = conds[2]
+        conditions = lines[2].replace('#', "").lstrip().split()
+        if len(conditions) > 3:
+            conditions = conditions[2]
         else:
-            conds = ""
-        data['conditions'] = conds
+            conditions = ""
+        data['conditions'] = conditions
         ln = 0
         while ln < len(lines):
             line = lines[ln].lstrip()
@@ -93,7 +93,7 @@ def cif_to_dict(path: str) -> dict:
     
     
 def format_cif_data(cif_data: dict) -> dict:
-    numeric_arribs = [
+    numeric_attributes = [
         '_chemical_formula_weight'
         '_cell_length_a ',
         '_cell_length_b',
@@ -107,7 +107,7 @@ def format_cif_data(cif_data: dict) -> dict:
         # '#_database_code_PCD',
         ]
     
-    for k in numeric_arribs:
+    for k in numeric_attributes:
         if k in cif_data:
             if k in ['_cell_formula_units_Z', '_space_group_IT_number', 
                     #  '#_database_code_PCD'
@@ -119,14 +119,14 @@ def format_cif_data(cif_data: dict) -> dict:
             else:
                 cif_data[k] = float(cif_data[k][0])
     
-    string_arribs = [
+    string_attributes = [
         '_chemical_formula_sum',
         '_chemical_name_structure_type',
         '_space_group_name_H-M_alt',
         'conditions'
         ]
     
-    for k in string_arribs:
+    for k in string_attributes:
         if k in cif_data:
             if isinstance(cif_data[k], list):
                 cif_data[k] = ''.join(cif_data[k]).replace("'", '').replace("~", "")
@@ -329,10 +329,10 @@ def get_site_element_dist(dataframe: pd.DataFrame, site: str = None) -> pd.DataF
     return element_stats
 
 
-def format_wyckoff_site_label(site_label, italisize=False):
+def format_wyckoff_site_label(site_label, italicize=False):
     ws = [v for v in re.split(r'\d+', site_label) if v !=''][0]
     nums = [s for s in site_label.split(ws) if s != ""]
-    if italisize:
+    if italicize:
         site_label = nums[0] + f'${ws}$'
     else:
         site_label = nums[0] + f'{ws}'
@@ -341,12 +341,12 @@ def format_wyckoff_site_label(site_label, italisize=False):
     return site_label
 
 
-def ptable_heatmap_mpl(vals_dict: dict, site: str, stype: str, cmap: str):
+def ptable_heatmap_mpl(vals_dict: dict, site: str, stype: str, cmap: str, title=None):
     
     # format site
     elements_in_data = list(vals_dict.keys())
     if site is not None:
-        site = format_wyckoff_site_label(site, italisize=True)
+        site = format_wyckoff_site_label(site, italicize=True)
     
     elements = {'H': [1, 1], 'He': [1, 18], 'Li': [2, 1], 'Be': [2, 2], 'B': [2, 13], 'C': [2, 14], 'N': [2, 15], 'O': [2, 16], 'F': [2, 17], 'Ne': [2, 18], 
                 'Na': [3, 1], 'Mg': [3, 2], 'Al': [3, 13], 'Si': [3, 14], 'P': [3, 15], 'S': [3, 16], 'Cl': [3, 17], 'Ar': [3, 18], 'K': [4, 1], 'Ca': [4, 2], 
@@ -360,14 +360,15 @@ def ptable_heatmap_mpl(vals_dict: dict, site: str, stype: str, cmap: str):
                 'Np': [9, 8], 'Pu': [9, 9], 'Am': [9, 10], 'Cm': [9, 11], 'Bk': [9, 12], 'Cf': [9, 13], 'Es': [9, 14], 'Fm': [9, 15], 'Md': [9, 16], 'No': [9, 17],
                 'Lr': [9, 18]}
     
-    pmask = np.zeros(shape=(9, 18))
+    pmask = np.zeros(shape=(9, 18), dtype=float)
     for k, v in elements.items():
         p, g = v
         pmask[p-1, g-1] = 1
     
     min_value = min(vals_dict.values())
-    norm_const = max(vals_dict.values()) - min_value
-    heat_map = np.full(shape=(9, 18), fill_value=-(min_value))
+    norm_const = max(max(vals_dict.values()) - min_value, min_value)
+            
+    heat_map = np.full(shape=(9, 18), fill_value=-(min_value), dtype=float)
     for k, v in elements.items():
         if k in vals_dict:
             heat_map[v[0]-1, v[1]-1] = vals_dict[k]
@@ -403,7 +404,8 @@ def ptable_heatmap_mpl(vals_dict: dict, site: str, stype: str, cmap: str):
     im.axes.text(2, 5.1, '*', alpha=0.6, **kw)
     im.axes.text(2, 7.1, '*', alpha=0.6, **kw)
     for k, v in elements.items():
-        c = 'w' if ((vals_dict[k] - min_value) / norm_const) > 0.6 else 'k'
+
+        c = 'w' if ((vals_dict.get(k, 0) - min_value) / norm_const) > 0.6 else 'k'
         if k in elements_in_data:
             im.axes.text(v[1]-1, v[0]-1, k, c=c, **kw)
         else:
@@ -423,9 +425,12 @@ def ptable_heatmap_mpl(vals_dict: dict, site: str, stype: str, cmap: str):
     
     # compose title and wrap
     if site is not None:
-        text_str = f"element distribution of {site} site in {stype.split(',')[0]}-type compounds"
+        text_str = f"element distribution of {site} site in {format_formula(stype.split(',')[0])}-type compounds"
     else:
-        text_str = f"element distribution in {stype.split(',')[0]}-type compounds"
+        if title is not None:
+            text_str = title
+        else:
+            text_str = f"element distribution in {format_formula(stype.split(',')[0])}-type compounds"
     words = text_str.split()
     wrapped_text = ""
     line = ""
@@ -454,16 +459,35 @@ def ptable_heatmap_mpl(vals_dict: dict, site: str, stype: str, cmap: str):
     ax.spines['bottom'].set_visible(False)
     ax.spines['left'].set_visible(False)
     
-    stype = '-'.join(stype.split(',')[:2])
-    if site is not None:
-        plt.savefig(f"ElemDist_{stype}_{site.replace('$', '').replace(' ', '')}.png", dpi=300)
+    if title is None:
+        filename = '-'.join(stype.split(',')[:2])
     else:
-        plt.savefig(f"ElemDist_{stype}.png", dpi=300)
+        filename = title
+    if site is not None:
+        plt.savefig(f"ElemDist_{filename}_{site.replace('$', '').replace(' ', '')}.png", dpi=300)
+    else:
+        plt.savefig(f"ElemDist_{filename}.png", dpi=300)
         
 
 def get_ws(s):
     s = re.split(r'\d', s)
     return [_s for _s in s if _s != ''][0]
+
+
+def format_formula(formula):
+    formula = _parse_formula(formula)
+    
+    new_formula = ""
+    for k, v in formula.items():
+        if v == 1.0:
+            new_formula += k
+        else:
+            if abs(int(v) - v) < 1e-3:
+                new_formula += k + "$_{%s}$" % int(v)
+            else:
+                new_formula += k + "$_{%s}$" % v
+    
+    return new_formula
 
 
 if __name__ == "__main__":
@@ -475,9 +499,9 @@ if __name__ == "__main__":
     
     cif_filenames = []
     root = sys.argv[2]
-    with open(sys.argv[1], 'r') as f:
+    with open(sys.argv[1], 'r', encoding='utf-8-sig') as f:
         for line in f.readlines():
-            line = line.replace('\n', "")
+            line = line.replace('\n', "").strip()
             if not line.endswith('.cif'):
                 line += '.cif'
             cif_filenames.append(line)
@@ -494,14 +518,19 @@ if __name__ == "__main__":
             cif_file_data.append({'Filename': cif_name, 'Formula': formula, 'Structure type': stype})
         except Exception as e:
             print(f"Error reading {cif_path} file.")
-            # print(e)
+            print(e)
     
     cif_file_data = pd.DataFrame(cif_file_data)
     stypes = cif_file_data['Structure type'].value_counts()
+    stypes = stypes[stypes > 1]
+    
+    if not len(stypes):
+        print(f"No structure type has more than one cif in the provided list.")
+        exit(0)
     
     # Get user input for structure type
-    if len(stypes) > 1: 
-        print("More than one structure types are fould in the input list.")
+    if len(stypes) > 1:  
+        print("More than one structure types are found in the input list.")
         print("Please select one structure type form the list below.")
 
         print(f"\nNo  {'Count':<5} Structure type")
@@ -531,8 +560,8 @@ if __name__ == "__main__":
     
     # Get user input for sites
     if len(all_sites) > 5:
-        print(f"There are {len(all_sites)} sites present for this structure type.")
-        print("Please select a maximum of five sites from the the list below.")
+        print(f"\nThere are {len(all_sites)} sites present for this structure type.")
+        print("Please select the sites from the the list below.")
         print("Enter the numbers separated by space. e.g. 1 3 4 6")
         
         print("\nNo Site")
@@ -541,13 +570,18 @@ if __name__ == "__main__":
 
         valid_input = False
         while not valid_input:
-            res = input("Please enter the numbers corresponding to the selected sites: \n")
+            res = input("\nEnter 0 to plot all sites or enter the numbers corresponding to the selected sites: \n")
             try:
                 res = res.replace(',', ' ')
                 res = [int(r) for r in res.split()]
-                assert np.all(np.array(res) <= len(all_sites))
-                sites = [all_sites[i-1] for i in res]
-                valid_input = True
+                if not 0 in res:
+                    assert np.all(np.array(res) <= len(all_sites))
+                    sites = [all_sites[i-1] for i in res]
+                    valid_input = True
+                else:
+                    valid_input = True
+                    print("Plotting all sites.")
+                    sites = all_sites
             except Exception as e:
                 print(e)
                 print("Invalid input. Try again.")
@@ -592,10 +626,12 @@ if __name__ == "__main__":
     data.rename(columns=dict(zip(formatted_site_names.values(), formatted_site_names.keys())), inplace=True)
     
     # Plot site heatmaps
-    cmaps = ["Reds", "Blues", "Greens", "Purples", "Oranges"]
+    cmaps = ["Reds", "Blues", "Greens", "Purples", "Oranges", "YlOrBr", "OrRd", "PuRd", "RdPu", "BuPu", "GnBu",
+             "PuBu", "YlGnBu", "PuBuGn", "BuGn", "YlGn", "viridis", "plasma", "inferno", "magma", "cividis"]
+    
     for i, site in enumerate(sites):
         print(f"Processing {site}")
-        ptable_heatmap_mpl(vals_dict=get_site_element_dist(data, site), site=site, stype=selected_stype, cmap=cmaps[i])
+        ptable_heatmap_mpl(vals_dict=get_site_element_dist(data, site), site=site, stype=selected_stype, cmap=cmaps[i % len(cmaps)])
     
     # Cumulative heatmap
-    ptable_heatmap_mpl(vals_dict=get_site_element_dist(data.iloc[1:], site=None), site=None, stype=selected_stype, cmap="Greys")
+    ptable_heatmap_mpl(vals_dict=get_site_element_dist(data, site=None), site=None, stype=selected_stype, cmap="Greys")

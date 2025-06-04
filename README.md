@@ -19,7 +19,7 @@ Any `.cif` files.
 
 ## Getting started
 
-Copy each line into your command-line applications. The code needs (i) a file containing list of filename/PCD numbers and (ii) path to folder containing all cifs. This will make it easy when you have CIFs with several structure types in one folder - no need to separate them.
+Copy each line into your command-line applications. The code needs (i) a file containing a list of filenames/PCD numbers and (ii) a path to the folder containing all cifs. This will make it easy when you have CIFs with several structure types in one folder - no need to separate them.
 
 ```bash
 $ git clone https://github.com/EmilJaffal/Site-Analysis
@@ -33,8 +33,8 @@ appear, asking you to choose one of the available structure types:
 
 ```text
 
-More than one structure types are fould in the input list.
-Please select one structure type form the list below.
+More than one structure type is found in the input list.
+Please select one structure type from the list below.
 
 No  Count Structure type
 (1) 19    CuTi,tP4,129
@@ -48,8 +48,8 @@ When a structure type has more than 5 sites, a prompt will be given to select th
 
 ```
 There are 9 sites present for this structure type.
-Please select a maximum of five sites from the the list below.
-Enter the numbers separated by space. e.g. 1 3 4 6
+Please select a maximum of five sites from the list below.
+Enter the numbers separated by a space. e.g. 1 3 4 6
 
 No Site
 (1) 8a
@@ -67,7 +67,7 @@ Please enter the numbers corresponding to the selected sites:
 #### Output 1 - .csv
 
 Data for each folder is saved in `[structuretype].csv`. Below is an example of a .csv of your structure type containing: filename, formula, notes (synthesis conditions), # of elements and site occupations.
-The first row shows the average coordinates of the sites along with the associated standard deviation for all the files processed with the selected structure type.  
+The first row shows the sites' average coordinates and the associated standard deviation for all the files processed with the selected structure type.  
 
 You can find an example of our test set here: [SA-csv](https://github.com/EmilJaffal/Site-Analysis/blob/main/CuTi-tP4.csv)
 
@@ -77,7 +77,7 @@ Periodic table heat maps showing element distribution of the compounds in the se
 
 ![SA-heatmap](https://github.com/EmilJaffal/Site-Analysis/blob/main/ElemDist_CuTi-tP4.png)
 
-and element distribution of sites:
+and the element distribution of sites:
 
 ![SA-site-heatmap](https://github.com/EmilJaffal/Site-Analysis/blob/main/ElemDist_CuTi-tP4_2c(1).png)
 
