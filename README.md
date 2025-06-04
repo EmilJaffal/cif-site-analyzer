@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/emiljaffal/Site-Analysis/blob/main/LICENSE)
 ![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)
 
-This script parses .cif files based on structure type and creates a CSV table with site compositions, and heat maps for each site (up to 5 sites) and a heat map for compositions. Run the main.py file with (i) a text file containing the cif file names to analyze (belonging to the same structure type) and (ii) the path of the folder containing CIFs as arguments.
+This script parses .cif files based on structure type and creates a CSV table with site compositions, and heat maps for each site (up to 5 sites) and a heat map for compositions. Run the main.py file with (i) a folder containing same-structure-type CIFs in the same directory as the main.py file (cif-site-analyzer).
 
 > The current README.md serves as a tutorial and documentation - last update December 21, 2024
 
