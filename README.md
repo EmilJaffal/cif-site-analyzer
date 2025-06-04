@@ -19,13 +19,13 @@ Any `.cif` files.
 
 ## Getting started
 
-Copy each line into your command-line applications. The code needs (i) a file containing a list of filenames/PCD numbers and (ii) a path to the folder containing all cifs. This will make it easy when you have CIFs with several structure types in one folder - no need to separate them.
+Copy each line into your command-line applications. The code needs (i) a folder containing same-structure-type CIFs in the same directory as the main.py file (cif-site-analyzer).
 
 ```bash
-$ git clone https://github.com/EmilJaffal/Site-Analysis
-$ cd Site-Analysis
+$ git clone https://github.com/EmilJaffal/cif-site-analyzer
+$ cd cif-site-analyzer
 $ pip install -r requirements.txt
-$ python main.py [cif_names].csv [cif_folder_name]
+$ python main.py
 ```
 
 Once the code is executed using `python main.py`, the following prompt will
@@ -33,16 +33,13 @@ appear, asking you to choose one of the available structure types:
 
 ```text
 
-More than one structure type is found in the input list.
-Please select one structure type from the list below.
+Folders with .cif files:
+1. NaCl,cF8,225 (20 files)
 
-No  Count Structure type
-(1) 19    CuTi,tP4,129
-(2) 5     Ca14AlSb11,tI208,142
-Please enter the number corresponding to the selected structure type: 
+Would you like to process each folder above sequentially? (Y/n): 
 ```
 
-You may then choose to process whichever structure type you would like, and it will process the sites.
+You may then choose to process whichever structure type folder you would like, and it will process the sites.
 
 When a structure type has more than 5 sites, a prompt will be given to select the sites for further analysis. For any option, SA will ask you to choose a structure type from the folder containing `.cif` files:
 
@@ -50,6 +47,7 @@ When a structure type has more than 5 sites, a prompt will be given to select th
 There are 9 sites present for this structure type.
 Please select a maximum of five sites from the list below.
 Enter the numbers separated by a space. e.g. 1 3 4 6
+Enter 0 to plot all sites or enter the numbers corresponding to the selected sites
 
 No Site
 (1) 8a
@@ -69,7 +67,7 @@ Please enter the numbers corresponding to the selected sites:
 Data for each folder is saved in `[structuretype].csv`. Below is an example of a .csv of your structure type containing: filename, formula, notes (synthesis conditions), # of elements and site occupations.
 The first row shows the sites' average coordinates and the associated standard deviation for all the files processed with the selected structure type.  
 
-You can find an example of our test set here: [SA-csv](https://github.com/EmilJaffal/Site-Analysis/blob/main/CuTi-tP4.csv)
+You can find an example of our test set here: [demo_cifs](https://github.com/EmilJaffal/cif-site-analyzer/tree/main/NaCl%2CcF8%2C225)
 
 #### Output 2 - Heatmaps
 
@@ -79,15 +77,17 @@ Periodic table heat maps showing element distribution of the compounds in the se
 
 and the element distribution of sites:
 
-![SA-site-heatmap](https://github.com/EmilJaffal/Site-Analysis/blob/main/ElemDist_CuTi-tP4_2c(1).png)
+![SA-site-heatmap](https://github.com/EmilJaffal/cif-site-analyzer/blob/main/ElemDist_NaCl-cF8.png)
 
-## Installation
+When done, the following prompt will display:
 
-```bash
-$ git clone https://github.com/EmilJaffal/Site-Analysis
-$ cd Site-Analysis
-$ pip install -r requirements.txt
-$ python main.py [name].csv [cif_folder_name]
+```text
+Saved 3 PNG files:
+  ElemDist_NaCl-cF8_4a.png
+  ElemDist_NaCl-cF8_4b.png
+  ElemDist_NaCl-cF8.png
+Saved CSV file: NaCl-cF8_NaCl,cF8,225.csv
+Thanks for using cif-site-analyzer! teehee
 ```
 
 ## Contributors
@@ -98,7 +98,7 @@ $ python main.py [name].csv [cif_folder_name]
 
 ## How to ask for help
 
-`Site-Analysis` is also designed for experimental materials scientists and chemists.
+`cif-site-analyzer` is also designed for experimental materials scientists and chemists.
 
 - If you have any issues or questions, please feel free to reach out or
   [leave an issue](https://github.com/emiljaffal/Site-Analysis/issues).

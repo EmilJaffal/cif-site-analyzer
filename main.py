@@ -535,19 +535,24 @@ if __name__ == "__main__":
         print(f"{i}. {dir_name} ({len(cif_files)} files)")
 
     # Prompt user for sequential processing or selection
-    resp = input("\nWould you like to process each folder above sequentially? (Y/n): ").strip().lower()
-    if resp in ["", "y", "yes"]:
-        selected_indices = list(range(1, len(candidate_dirs) + 1))
-    else:
-        while True:
-            folder_numbers_str = input("Enter the numbers corresponding to the folders listed above, separated by spaces (e.g. 1 2 3): ")
-            try:
-                selected_indices = list(set(int(number) for number in folder_numbers_str.split()))
-                if not all(1 <= idx <= len(candidate_dirs) for idx in selected_indices):
-                    raise ValueError("One or more numbers are out of the valid range.")
-                break
-            except ValueError:
-                print("Please enter only valid numbers within the range, separated by spaces.")
+    while True:
+        resp = input("\nWould you like to process each folder above sequentially? (Y/n): ").strip().lower()
+        if resp in ["", "y", "yes"]:
+            selected_indices = list(range(1, len(candidate_dirs) + 1))
+            break
+        elif resp in ["n", "no"]:
+            while True:
+                folder_numbers_str = input("Enter the numbers corresponding to the folders listed above, separated by spaces (e.g. 1 2 3): ")
+                try:
+                    selected_indices = list(set(int(number) for number in folder_numbers_str.split()))
+                    if not all(1 <= idx <= len(candidate_dirs) for idx in selected_indices):
+                        raise ValueError("One or more numbers are out of the valid range.")
+                    break
+                except ValueError:
+                    print("Please enter only valid numbers within the range, separated by spaces.")
+            break
+        else:
+            print("Invalid input. Please enter Y or N.")
 
     print("\nSelected folders:")
     for idx in selected_indices:
