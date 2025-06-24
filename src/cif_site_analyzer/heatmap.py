@@ -9,7 +9,12 @@ from .utilities import format_mixed_formula
 
 
 def ptable_heatmap_mpl(
-    vals_dict: dict, site: str, stype: str, cmap: str, title=None
+    vals_dict: dict,
+    site: str,
+    stype: str,
+    cmap: str,
+    plot_filename: str,
+    title=None,
 ):
 
     # format site
@@ -277,8 +282,7 @@ def ptable_heatmap_mpl(
         filename = title
     if site is not None:
         plt.savefig(
-            f"ElemDist_{filename}_\
-                {site.replace('$', '').replace(' ', '')}.png",
+            plot_filename,
             dpi=300,
         )
     else:

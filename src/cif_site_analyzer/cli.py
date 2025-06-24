@@ -279,24 +279,33 @@ def main():
         png_files = []
         for i, site in enumerate(sites):
             print(f"Processing {site}")
+
+            filename = "ElemDist_"
+            filename += f"{'-'.join(selected_stype.split(',')[:2])}".strip()
+            filename += (
+                f"_{site.replace('$', '').replace(' ', '')}.png".strip()
+            )
+            png_files.append(filename)
+
             ptable_heatmap_mpl(
                 vals_dict=get_site_element_dist(data, site),
                 site=site,
                 stype=selected_stype,
                 cmap=cmaps[i % len(cmaps)],
+                plot_filename=filename,
             )
 
-            filename = "ElemDist_"
-            filename += f"{'-'.join(selected_stype.split(',')[:2])}"
-            filename += f"_{site.replace('$', '').replace(' ', '')}.png"
-            png_files.append(filename)
-
         # Cumulative heatmap
+
+        filename = "ElemDist_"
+        filename += f"{'-'.join(selected_stype.split(',')[:2])}.png".strip()
+
         ptable_heatmap_mpl(
             vals_dict=get_site_element_dist(data, site=None),
             site=None,
             stype=selected_stype,
             cmap="Greys",
+            plot_filename=filename,
         )
         cum_filename = (
             f"ElemDist_{'-'.join(selected_stype.split(',')[:2])}.png"
