@@ -39,7 +39,7 @@ _chemical_formula_weight                 166.0
 # Bibliographic data
 
 _publ_section_title
-'Precision measurements of crystals of the alkali halides'                    
+'Precision measurements of crystals of the alkali halides'
 _journal_coden_ASTM                      PHRVAO
 _journal_name_full                       'Phys. Rev.'
 _journal_year                            1923
@@ -327,4 +327,3 @@ loop_
  6 4 2 0.94 1
 
 # End of data set 1300919
-

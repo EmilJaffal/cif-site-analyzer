@@ -39,7 +39,7 @@ _chemical_formula_weight                 164.4
 # Bibliographic data
 
 _publ_section_title
-'Composition limits and vaporization behaviour of rare earth nitrides'        
+'Composition limits and vaporization behaviour of rare earth nitrides'
 _journal_coden_ASTM                      JINCAO
 _journal_name_full                       'J. Inorg. Nucl. Chem.'
 _journal_year                            1974
@@ -312,4 +312,3 @@ _pd_proc_ls_proof_wR_factor              ?
 _refine_ls_R_I_factor                    ?
 
 # End of data set 531936
-

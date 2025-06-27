@@ -327,4 +327,3 @@ _refine_ls_R_factor_gt                   0.015
 _refine_ls_wR_factor_gt                  0.016
 
 # End of data set 529600
-

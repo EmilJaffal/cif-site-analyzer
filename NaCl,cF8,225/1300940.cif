@@ -39,7 +39,7 @@ _chemical_formula_weight                 25.9
 # Bibliographic data
 
 _publ_section_title
-'Unit-Cell Dimensions of Lithium Fluoride made from Li^6^ and Li^7^'          
+'Unit-Cell Dimensions of Lithium Fluoride made from Li^6^ and Li^7^'
 _journal_coden_ASTM                      ACCRA9
 _journal_name_full                       'Acta Crystallogr.'
 _journal_year                            1955
@@ -301,4 +301,3 @@ _refine_ls_R_factor_gt                   ?
 _refine_ls_wR_factor_gt                  ?
 
 # End of data set 1300940
-
