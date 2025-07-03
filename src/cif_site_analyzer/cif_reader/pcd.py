@@ -44,7 +44,10 @@ class PCD_reader(CIF_Reader):
         return self.get_block("space_group_IT_number")
 
     def get_structure_type(self):
-        return self.get_block("chemical_name_structure_type")
+        value = self.get_block("chemical_name_structure_type")
+        if value is not None:
+            value = value.replace("~", "")
+        return value
 
     def get_origin_choice(self):
         hm_alt = self.get_block("space_group_name_H-M_alt")
@@ -124,7 +127,7 @@ class PCD_reader(CIF_Reader):
 
                     _site_values[header] = value
                 elif header in self.headers_numeric:
-                    _site_values[header] = float(value)
+                    _site_values[header] = self.get_float(value)
                 else:
                     _site_values[header] = value
 
