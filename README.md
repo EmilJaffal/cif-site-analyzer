@@ -53,3 +53,9 @@ pip list
 ## How to run?
 
 While `cif_site_analyzer_env` is activated in terminal window, type `site_analyzer` and answer the prompts!
+
+## Citations
+
+If you use ```CIF Site Analyzer``` in your ressearch please cite the following :)
+https://link.springer.com/article/10.1007/s40192-025-00400-x#citeas
+
