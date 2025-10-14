@@ -6,6 +6,7 @@ from .utils import list_to_formula
 from .utils import assign_labels_for_sites
 from .utils import auto_group_sites
 from .utils import get_valid_input
+from .utils import concat_site_formula
 from .features import add_features
 from .ptable_histogram import ptable_heatmap_mpl
 from .plsda import run_pls_da
@@ -96,6 +97,8 @@ def main():
         selected_stype = list(stypes.keys())[0]
 
     data_for_engine = prepare_data_for_engine(cif_data, selected_stype)
+    os.makedirs("outputs/plots", exist_ok=True)
+    os.makedirs("outputs/csv", exist_ok=True)
 
     # Save histograms
     data_df = pd.DataFrame(data_for_engine)
@@ -109,11 +112,23 @@ def main():
     auto_assignment = auto_group_sites(wyckoff_symbol_elements)
     site_assignment = assign_labels_for_sites(wyckoff_symbols, auto_assignment)
 
+    data_df_w_groups = data_df.copy(deep=True)
+
+    data_df_w_groups[list(site_assignment.keys())] = data_df_w_groups.apply(
+        lambda r: concat_site_formula(r, site_assignment),
+        axis=1,
+        result_type="expand",
+    )
+
+    data_df_w_groups.to_csv(f"outputs/csv/{selected_stype}.csv", index=False)
+
     print("\nGenerating periodic table heatmaps...")
-    os.makedirs("outputs/plots", exist_ok=True)
     for i, (k, v) in enumerate(site_assignment.items()):
         v = list(v)
-        print(f"Plotting periodic table heatmap for {k}: {v} site")
+        msg = f"Plotting periodic table heatmap for {k}: ({', '.join(v)}) site"
+        if len(v) > 1:
+            msg += "s"
+        print(msg)
         ptable_heatmap_mpl(
             vals_dict=get_ptable_vals_dict(data_df[v[0]].tolist()),
             site=v,

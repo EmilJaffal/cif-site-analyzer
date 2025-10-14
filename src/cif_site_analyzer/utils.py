@@ -3,6 +3,29 @@ import pandas as pd
 from collections import defaultdict
 
 
+def concat_site_formula(row, site_assignment):
+    group_formulae = []
+    for _, sites in site_assignment.items():
+        sites = list(sites)
+        groupf = row[sites[0]]
+        for site in sites[1:]:
+            groupf += row[site]
+
+        groupf = _parse_formula(groupf)
+
+        groups = ""
+        for e, c in groupf.items():
+            if c == 1.0:
+                groups += e
+            elif abs(c - int(c)) == 0:
+                groups += f"{e}{int(c)}"
+            else:
+                groups += f"{e}{round(float(c), 2)}"
+        group_formulae.append(groups)
+
+    return group_formulae
+
+
 def auto_group_sites(wyckoff_symbol_elements, threshold=0.1):
 
     wyckoff_symbol_elements_s = []
