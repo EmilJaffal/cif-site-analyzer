@@ -1,323 +1,224 @@
-from .heatmap import ptable_heatmap_mpl
-from .utilities import find_sites_with_same_wyckoff_symbols
-from .utilities import format_wyckoff_site_label
-from .utilities import get_site_element_dist
-from .utilities import get_data_row
-from .utilities import get_ws
-from cif_site_analyzer.cif_reader import read_cif
+from .get_data import load_cif
+from .get_data import select_one_stype
+from .get_data import prepare_data_for_engine
+from .utils import get_ptable_vals_dict
+from .utils import list_to_formula
+from .utils import assign_labels_for_sites
+from .utils import auto_group_sites
+from .utils import get_valid_input
+from .utils import concat_site_formula
+from .features import add_features
+from .ptable_histogram import ptable_heatmap_mpl
+from .plsda import run_pls_da
+from .visualization import visualize_elements
+from .projection import plot_elements_from_plsda_loadings
 import pandas as pd
-import numpy as np
+import argparse
 import os
-import re
+
+
+# Plot site heatmaps
+cmaps = [
+    "Reds",
+    "Blues",
+    "Greens",
+    "Purples",
+    "Oranges",
+    "YlOrBr",
+    "OrRd",
+    "PuRd",
+    "RdPu",
+    "BuPu",
+    "GnBu",
+    "PuBu",
+    "YlGnBu",
+    "PuBuGn",
+    "BuGn",
+    "YlGn",
+    "viridis",
+    "plasma",
+    "inferno",
+    "magma",
+    "cividis",
+]
 
 
 def main():
+    description = """
+        A High Throughput LMTO Calculator.
 
-    print("Welcome to CIF Site Analyzer")
+        This code automates the LMTO calculations using TB-LMTO program.
 
-    current_dir = os.getcwd()
+        """
+    parser = argparse.ArgumentParser(
+        description=description, formatter_class=argparse.RawTextHelpFormatter
+    )
+    parser.add_argument("input_path", help="Path to the input file / folder")
 
-    # Find all folders in the script directory
-    # that contain at least one .cif file
-    candidate_dirs = []
-    for item in os.listdir(current_dir):
-        full_path = os.path.join(current_dir, item)
-        if os.path.isdir(full_path):
-            cif_files = [
-                f for f in os.listdir(full_path) if f.lower().endswith(".cif")
-            ]
-            if cif_files:
-                candidate_dirs.append((item, cif_files))
+    args = parser.parse_args()
 
-    if not candidate_dirs:
-        print(
-            f"No folders containing .cif files found \
-            in {current_dir}. Please add a folder with .cif files."
-        )
+    path = args.input_path
+    if not os.path.isdir(path):
+        print(f"Cannot find {path}.")
+
+    # DATA
+    cif_data = load_cif(path, dev=True)
+    stypes = select_one_stype(cif_data)
+
+    if len(cif_data) == 0:
+        print("No data found!")
         exit(0)
 
-    print("\nFolders with .cif files:")
-    for i, (dir_name, cif_files) in enumerate(candidate_dirs, start=1):
-        print(f"{i}. {dir_name} ({len(cif_files)} files)")
-
-    # Prompt user for sequential processing or selection
-    while True:
-        resp = (
-            input(
-                "\nWould you like to process each folder above "
-                "sequentially? (Y/n): "
-            )
-            .strip()
-            .lower()
+    if len(stypes) > 1:
+        stypes = [[k, v] for k, v in stypes.items()]
+        print(
+            "\n\nMore than one structure types are found in the input list. \
+                \nPlease select one structure type from the list below.\n"
         )
-        if resp in ["", "y", "yes"]:
-            selected_indices = list(range(1, len(candidate_dirs) + 1))
-            break
-        elif resp in ["n", "no"]:
-            while True:
-                folder_numbers_str = input(
-                    "Enter the numbers corresponding to the "
-                    "folders listed above, separated by spaces (e.g. 1 2 3): "
-                )
-                try:
-                    selected_indices = list(
-                        set(
-                            int(number)
-                            for number in folder_numbers_str.split()
-                        )
-                    )
-                    if not all(
-                        1 <= idx <= len(candidate_dirs)
-                        for idx in selected_indices
-                    ):
-                        raise ValueError(
-                            "One or more numbers are out of the valid range."
-                        )
-                    break
-                except ValueError:
-                    print(
-                        "Please enter only valid numbers within the range, "
-                        "separated by spaces."
-                    )
-            break
-        else:
-            print("Invalid input. Please enter Y or N.")
 
-    print("\nSelected folders:")
-    for idx in selected_indices:
-        print(f"{idx}. {candidate_dirs[idx-1][0]}")
+        for i, (stype, count) in enumerate(stypes, 1):
+            print(f"({i}) {count:<5} {stype}")
 
-    # Process each selected folder
-    for idx in selected_indices:
-        dir_name, cif_filenames = candidate_dirs[idx - 1]
-        cif_dir = os.path.join(current_dir, dir_name)
-        print(f"\nProcessing folder: {dir_name}")
-
-        # --- The rest of your original processing code goes here,
-        # replacing 'cif_dir' and 'cif_filenames' as needed ---
-        cif_file_data = []
-        for cif_name in cif_filenames:
-            cif_path = os.path.join(cif_dir, cif_name)
+        valid_input = False
+        while not valid_input:
+            res = input(
+                "Please enter the number corresponding to the \
+                    selected structure type: \n"
+            )
             try:
-                cif = read_cif(cif_path)
-                formula = cif.formula
-                stype = cif.structure_type
-                cif_file_data.append(
-                    {
-                        "Filename": cif_name,
-                        "Formula": formula,
-                        "Structure type": stype,
-                    }
-                )
-            except Exception as e:
-                print(f"Error reading {cif_path} file.")
-                print(e)
+                res = int(res)
+                assert 0 < res <= len(stypes)
+                selected_stype = stypes[res - 1][0]
+                valid_input = True
+            except Exception:
+                # print(e)
+                print("Invalid input. Try again.")
+    else:
+        selected_stype = list(stypes.keys())[0]
 
-        cif_file_data = pd.DataFrame(cif_file_data)
-        stypes = cif_file_data["Structure type"].value_counts()
-        stypes = stypes[stypes > 1]
+    data_for_engine = prepare_data_for_engine(cif_data, selected_stype)
+    os.makedirs("outputs/plots", exist_ok=True)
+    os.makedirs("outputs/csv", exist_ok=True)
 
-        if not len(stypes):
-            print(
-                "No structure type has more than one cif in the provided list."
-            )
-            continue
+    # Save histograms
+    data_df = pd.DataFrame(data_for_engine)
+    wyckoff_symbols = data_df.columns[4:]
 
-        # Get user input for structure type
-        if len(stypes) > 1:
-            print("More than one structure types are found in the input list.")
-            print("Please select one structure type from the list below.")
+    # RMX assignment
+    wyckoff_symbol_elements = {}
+    for ws in wyckoff_symbols:
+        wyckoff_symbol_elements[ws] = list(data_df[ws].unique())
 
-            print(f"\nNo  {'Count':<5} Structure type")
-            for i, (index, r) in enumerate(stypes.items(), 1):
-                print(f"({i}) {r:<5} {index}")
+    auto_assignment = auto_group_sites(wyckoff_symbol_elements)
+    site_assignment = assign_labels_for_sites(wyckoff_symbols, auto_assignment)
 
-            valid_input = False
-            while not valid_input:
-                res = input(
-                    "Please enter the number corresponding to the \
-                     selected structure type: \n"
-                )
-                try:
-                    res = int(res)
-                    assert res <= len(stypes)
-                    selected_stype = stypes.index[res - 1]
-                    valid_input = True
-                except Exception as e:
-                    print(e)
-                    print("Invalid input. Try again.")
-        else:
-            selected_stype = str(cif_file_data.iloc[0]["Structure type"])
+    data_df_w_groups = data_df.copy(deep=True)
 
-        selected_entries = cif_file_data[
-            cif_file_data["Structure type"] == selected_stype
-        ]["Filename"].to_list()
-        shared = find_sites_with_same_wyckoff_symbols(
-            os.path.join(cif_dir, selected_entries[0])
-        )
-        data0 = get_data_row(
-            os.path.join(cif_dir, selected_entries[0]), shared
-        )
-        all_sites = [
-            k
-            for k in data0.keys()
-            if k not in ["Filename", "Formula", "Notes", "Num Elements"]
-        ]
-        all_sites = sorted(
-            all_sites, key=lambda k: int(re.split("[a-z]", k)[0])
-        )
-        all_sites = sorted(all_sites, key=lambda k: get_ws(k))
+    data_df_w_groups[list(site_assignment.keys())] = data_df_w_groups.apply(
+        lambda r: concat_site_formula(r, site_assignment),
+        axis=1,
+        result_type="expand",
+    )
 
-        # Get user input for sites
-        if len(all_sites) > 5:
-            print(
-                f"\nThere are {len(all_sites)} sites present for this \
-                    structure type."
-            )
-            print("Please select the sites from the the list below.")
-            print("Enter the numbers separated by space. e.g. 1 3 4 6")
+    data_df_w_groups.to_csv(f"outputs/csv/{selected_stype}.csv", index=False)
 
-            print("\nNo Site")
-            for i, site in enumerate(all_sites, 1):
-                print(f"({i}) {site}")
-
-            valid_input = False
-            while not valid_input:
-                res = input(
-                    "\nEnter 0 to plot all sites or enter the numbers \
-                        corresponding to the selected sites: \n"
-                )
-                try:
-                    res = res.replace(",", " ")
-                    res = [int(r) for r in res.split()]
-                    if 0 in res:
-                        valid_input = True
-                        print("Plotting all sites.")
-                        sites = all_sites
-                    else:
-                        assert np.all(np.array(res) <= len(all_sites))
-                        sites = [all_sites[i - 1] for i in res]
-                        valid_input = True
-                except Exception as e:
-                    print(e)
-                    print("Invalid input. Try again.")
-        else:
-            sites = all_sites
-
-        # collect data from cifs
-        data = []
-        pos_data = dict(zip(all_sites, [[] for _ in range(len(data0) - 2)]))
-
-        for i in selected_entries:
-            row_data_w_coords = get_data_row(os.path.join(cif_dir, i), shared)
-            for k in all_sites:
-                pos_data[k].append(row_data_w_coords[k][1])
-                row_data_w_coords[k] = row_data_w_coords[k][0]
-            data.append(row_data_w_coords)
-
-        pos_row = dict(zip(data0.keys(), ["" for _ in range(len(data0))]))
-        for k in all_sites:
-            all_positions = np.array(pos_data[k])
-            avg_positions = ""
-            for i in range(3):
-                avg_positions += f"{all_positions[:, i].mean():.3f}"
-                if all_positions[:, i].std() > 0.001:
-                    avg_positions += (
-                        f"({int(round(all_positions[:, i].std(), 3)*1000)}) "
-                    )
-                else:
-                    avg_positions += " "
-            pos_row[k] = avg_positions
-        data.insert(0, pos_row)
-        data = pd.DataFrame(data)
-
-        # Format site names for writing csv
-        columns = [c for c in data.columns if c not in all_sites]
-        formatted_site_names = {}
-        for cname in all_sites:
-            new_name = format_wyckoff_site_label(cname)
-            formatted_site_names[cname] = new_name
-            columns.append(new_name)
-
-        data.rename(columns=formatted_site_names, inplace=True)
-        data[columns].to_csv(
-            f"{'-'.join(selected_stype.split(',')[:2])}_{dir_name}.csv",
-            index=False,
-        )
-        data.rename(
-            columns=dict(
-                zip(formatted_site_names.values(), formatted_site_names.keys())
-            ),
-            inplace=True,
-        )
-
-        # Plot site heatmaps
-        cmaps = [
-            "Reds",
-            "Blues",
-            "Greens",
-            "Purples",
-            "Oranges",
-            "YlOrBr",
-            "OrRd",
-            "PuRd",
-            "RdPu",
-            "BuPu",
-            "GnBu",
-            "PuBu",
-            "YlGnBu",
-            "PuBuGn",
-            "BuGn",
-            "YlGn",
-            "viridis",
-            "plasma",
-            "inferno",
-            "magma",
-            "cividis",
-        ]
-
-        png_files = []
-        for i, site in enumerate(sites):
-            print(f"Processing {site}")
-
-            filename = "ElemDist_"
-            filename += f"{'-'.join(selected_stype.split(',')[:2])}".strip()
-            filename += (
-                f"_{site.replace('$', '').replace(' ', '')}.png".strip()
-            )
-            png_files.append(filename)
-
-            ptable_heatmap_mpl(
-                vals_dict=get_site_element_dist(data, site),
-                site=site,
-                stype=selected_stype,
-                cmap=cmaps[i % len(cmaps)],
-                plot_filename=filename,
-            )
-
-        # Cumulative heatmap
-
-        filename = "ElemDist_"
-        filename += f"{'-'.join(selected_stype.split(',')[:2])}.png".strip()
-
+    print("\nGenerating periodic table heatmaps...")
+    for i, (k, v) in enumerate(site_assignment.items()):
+        v = list(v)
+        msg = f"Plotting periodic table heatmap for {k}: ({', '.join(v)}) site"
+        if len(v) > 1:
+            msg += "s"
+        print(msg)
         ptable_heatmap_mpl(
-            vals_dict=get_site_element_dist(data, site=None),
-            site=None,
-            stype=selected_stype,
-            cmap="Greys",
-            plot_filename=filename,
+            vals_dict=get_ptable_vals_dict(data_df[v[0]].tolist()),
+            site=v,
+            stype=data_df.iloc[0]["Entry prototype"],
+            cmap=cmaps[i % len(cmaps)],
         )
-        cum_filename = (
-            f"ElemDist_{'-'.join(selected_stype.split(',')[:2])}.png"
-        )
-        png_files.append(cum_filename)
+    print("Done, plots saved inside the directory plots.")
 
-        csv_filename = (
-            f"{'-'.join(selected_stype.split(',')[:2])}_{dir_name}.csv"
-        )
+    # df for recommendation engine
+    data = []
+    for cif_data in data_for_engine:
+        row = {
+            "Filename": cif_data["Filename"],
+            "Formula": cif_data["Formula"],
+        }
+        for group_label, sites in site_assignment.items():
+            gcomp = []
+            for site in sites:
+                gcomp.append(cif_data[site])
+            row[group_label] = list_to_formula(gcomp)
+        data.append(row)
 
-        print(f"\nSaved {len(png_files)} PNG files:")
-        for f in png_files:
-            print(f"  {f}")
-        print(f"Saved CSV file: {csv_filename}")
-        print("Thanks for using cif-site-analyzer! teehee\n")
+    df_engine = pd.DataFrame(data)
+    df_engine["Notes"] = ""
+
+    # add features
+    print("\nLoading features...")
+    features_df = add_features(df_engine)
+    print("Done")
+
+    # pls-da; 2-components
+    print("\nPerforming PLS-DA...")
+    pls_loadings = run_pls_da(features_df)
+    print("Done")
+
+    # elements projection
+    print("\nPlotting projections of elements and compounds...")
+    coords = plot_elements_from_plsda_loadings(pls_loadings, df_engine)
+    visualize_elements(coords, df_engine, compounds_markers=False)
+    visualize_elements(coords, df_engine, compounds_markers=True)
+    print("Done, plots saved in the directory plots.")
+
+    print(df_engine.head())
+
+    # get additional compounds for overlay
+    def get_additional_cpds():
+        res = get_valid_input(
+            "\nDo you want to add compounds to compare ? ",
+            ["Y", "y", "N", "n"],
+        )[0]
+        new_cpds = []
+
+        if res.lower() == "y":
+            print(f"The current site-group assignment is {site_assignment}.")
+
+            all_added = False
+            nc = 1
+            while not all_added:
+                new_cpd = get_valid_input(
+                    "Enter the elements (without coefficients) at each \n"
+                    "site-group\n for the new compound separated by comma : ",
+                    None,
+                )
+                new_cpd = dict(zip(site_assignment.keys(), new_cpd))
+                new_cpd["Formula"] = "".join(list(new_cpd.values()))
+                new_cpd["Notes"] = "candidate"
+                new_cpd["Filename"] = f"NewCand_{nc}"
+                new_cpds.append(new_cpd)
+
+                done = get_valid_input(
+                    "\nDo you wish to add more compounds ? ",
+                    ["Y", "y", "N", "n"],
+                )[0]
+                if done.lower() == "n":
+                    all_added = True
+        return new_cpds
+
+    new_cpds = get_additional_cpds()
+    new_cpds = pd.DataFrame(new_cpds)
+
+    df_engine = pd.concat([df_engine, new_cpds], axis=0, ignore_index=True)
+    visualize_elements(coords, df_engine, compounds_markers=True)
+
+    # elements for recommendations
+    # elements_for_screening = get_selected_elements(site_assignment)
+
+    # projection
+    # recommendation_engine(site_element_pools=elements_for_screening,
+    #                       sites_df=df_engine,
+    #                       coord_df=coords,
+    #                       output_file="outputs/recommendations.csv")
+
+    # Sm4Ir2InGe4, Tb4Rh2InGe4, Lu4Ni2InGe4

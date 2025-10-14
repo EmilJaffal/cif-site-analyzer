@@ -6,7 +6,7 @@ import os
 
 class CIF_Reader(ABC):
 
-    def __init__(self, filename, verbose=False):
+    def __init__(self, filename, data_source, verbose=False):
 
         self.filename = filename
         self.read_file()
@@ -14,9 +14,10 @@ class CIF_Reader(ABC):
         self.headers_numeric = ["x", "y", "z", "occupancy", "multiplicity"]
 
         # data
+        self.data_source = data_source
         self.formula_dict = self.get_formula_dict()
-        self.id = self.get_id()
         self.formula = self.get_formula()
+        self.id = self.get_id()
         Z, num_atoms = self.get_no_of_atoms()
         self.Z = Z
         self.num_atoms = num_atoms
@@ -24,14 +25,23 @@ class CIF_Reader(ABC):
         self.structure_type = self.get_structure_type()
         self.has_origin_choice_2 = self.get_origin_choice()
         self.cell = self.get_cell()
-        self.site_data = self.get_site_data()
-        self.add_coordinates()
+
+        try:
+            self.site_data = self.get_site_data()
+        except Exception as e:
+            print(f"Error reading site data from {self.filename}")
+            print(e)
+            return
+
         self.get_standardized_sites()
+        self.elements = list(set([site["symbol"] for site in self.site_data]))
+
         if verbose:
             self.read()
 
     def read(self):
         print(f"ID       : {self.id}")
+        print(f"Source   : {self.data_source}")
         print(f"Formula  : {self.formula_dict}")
         print(f"SG       : {self.space_group_number}")
         print(f"Z        : {self.Z}")
@@ -66,21 +76,23 @@ class CIF_Reader(ABC):
 
     def has_defect(self):
         for site in self.site_data:
+            if "occupancy" not in site:
+                return None
             if site["occupancy"] != 1.0:
                 return True
         return False
 
     def _parse_formula(self, formula):
+        if isinstance(formula, list):
+            formula = [
+                form for form in formula if "chemical_formula_sum" not in form
+            ][0]
+
         return _parse_formula(formula)
 
     def get_float(self, s):
         s = s.split("(")[0]
         return float(s)
-
-    def add_coordinates(self):
-        for i in range(len(self.site_data)):
-            coordinates = [self.site_data[i][axis] for axis in ["x", "y", "z"]]
-            self.site_data[i]["coordinates"] = coordinates
 
     def get_standardized_sites(self):
         standardized_size_data = []
