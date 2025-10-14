@@ -330,8 +330,8 @@ def ptable_heatmap_mpl(
     if site is not None:
         site = site.replace("$", "").replace(" ", "")
         plt.savefig(
-            f"plots/ElemDist_{filename}_{site}.png",
+            f"outputs/plots/ElemDist_{filename}_{site}.png",
             dpi=300,
         )
     else:
-        plt.savefig(f"plots/ElemDist_{filename}.png", dpi=300)
+        plt.savefig(f"outputs/plots/ElemDist_{filename}.png", dpi=300)

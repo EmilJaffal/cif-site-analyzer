@@ -41,7 +41,7 @@ def plot_confidence_ellipse(
     return ellipse
 
 
-def run_pls_da(df, output_loadings_excel="outputs/PLS_DA_loadings.csv"):
+def run_pls_da(df, output_loadings_excel="outputs/csv/PLS_DA_loadings.csv"):
     # -----------------------------
     # Prepare the data for PLS-DA
     # -----------------------------
@@ -79,13 +79,16 @@ def run_pls_da(df, output_loadings_excel="outputs/PLS_DA_loadings.csv"):
     # Generate scatter plot with ellipsoids
     # -----------------
     colors = [
-        "#c3121e",  # Sangre
-        "#0348a1",  # Neptune
-        "#ffb01c",  # Pumpkin
-        "#027608",  # Clover
-        "#1dace6",  # Cerulean
-        "#9c5300",  # Cocoa
-        "#9966cc",  # Amethyst
+        "tab:blue",
+        "tab:orange",
+        "tab:green",
+        "tab:red",
+        "tab:purple",
+        "tab:brown",
+        "tab:pink",
+        "tab:gray",
+        "tab:olive",
+        "tab:cyan",
     ]
 
     plt.style.use("ggplot")
@@ -129,8 +132,8 @@ def run_pls_da(df, output_loadings_excel="outputs/PLS_DA_loadings.csv"):
     ax.set_aspect("equal", adjustable="box")
     plt.tight_layout()
 
-    os.makedirs("plots", exist_ok=True)
-    plt.savefig("plots/PLS_DA_Scatter_Plot.svg", dpi=500)
+    os.makedirs("outputs/plots", exist_ok=True)
+    plt.savefig("outputs/plots/PLS_DA_Scatter_Plot.svg", dpi=500)
     # plt.show()
 
     # --------------------------------------
@@ -177,7 +180,7 @@ def run_pls_da(df, output_loadings_excel="outputs/PLS_DA_loadings.csv"):
         }
     )
 
-    top_contrib_path = os.path.join("outputs", "top_contribution.csv")
+    top_contrib_path = os.path.join("outputs", "csv", "top_contribution.csv")
     top_contrib_df.to_csv(top_contrib_path, index=False)
     print(f"Top 10 features saved to {top_contrib_path}.")
 

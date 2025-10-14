@@ -110,7 +110,7 @@ def main():
     site_assignment = assign_labels_for_sites(wyckoff_symbols, auto_assignment)
 
     print("\nGenerating periodic table heatmaps...")
-    os.makedirs("plots", exist_ok=True)
+    os.makedirs("outputs/plots", exist_ok=True)
     for i, (k, v) in enumerate(site_assignment.items()):
         v = list(v)
         print(f"Plotting periodic table heatmap for {k}: {v} site")

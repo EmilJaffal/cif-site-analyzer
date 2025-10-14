@@ -265,7 +265,7 @@ def visualize_elements(coord_df, sites_df=None, compounds_markers=True):
     plt.tight_layout()
 
     # ----- Build output file name based on conditions -----
-    output_filename = "plots/elements_visualization"
+    output_filename = "outputs/plots/elements_visualization"
     if compounds_markers:
         output_filename += "_compound"
     if sites_df is not None and candidate_found:

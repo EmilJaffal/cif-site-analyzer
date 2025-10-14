@@ -52,7 +52,9 @@ def prepare_coordinates(pls_loadings, element_properties_file):
     return df_props, coordinates
 
 
-def plot_elements(df, group_colors, output_path="plots/elements_plot.svg"):
+def plot_elements(
+    df, group_colors, output_path="outputs/plots/elements_plot.svg"
+):
     plt.figure(figsize=(8, 6), dpi=500)
     plt.style.use("ggplot")
 
@@ -148,7 +150,7 @@ def plot_elements_from_plsda_loadings(
         ["Symbol", "PLSDA_Component_1", "PLSDA_Component_2"]
     ].copy()
     coordinates_df.columns = ["Symbol", "x", "y"]
-    coordinates_df.to_csv("outputs/coordinates.csv", index=False)
+    coordinates_df.to_csv("outputs/csv/coordinates.csv", index=False)
     print("Element coordinates saved to outputs/coordinates.csv")
 
     return coordinates_df
