@@ -4,6 +4,7 @@ import matplotlib.patches
 import numpy as np
 import matplotlib.pyplot as plt
 from .utils import _parse_formula
+from .utils import get_colormap
 
 
 def format_wyckoff_site_label(site_label, italicize=False):
@@ -44,7 +45,7 @@ def format_formula(formula):
 
 
 def ptable_heatmap_mpl(
-    vals_dict: dict, site: str, stype: str, cmap: str, title=None
+    vals_dict: dict, site: str, stype: str, cmap, group: str, title=None
 ):
 
     # format site
@@ -172,6 +173,7 @@ def ptable_heatmap_mpl(
         pmask[p - 1, g - 1] = 1
 
     min_value = min(vals_dict.values())
+    # min_value = min(vals_dict.values())
     norm_const = max(max(vals_dict.values()) - min_value, min_value)
 
     heat_map = np.full(shape=(9, 18), fill_value=-(min_value), dtype=float)
@@ -183,7 +185,8 @@ def ptable_heatmap_mpl(
 
     fig, ax = plt.subplots(figsize=(18, 9))
 
-    cmap = plt.get_cmap(cmap)
+    # cmap = plt.get_cmap(cmap)
+    cmap = get_colormap(cmap, N=256)
     cmap.set_under("w", alpha=0.1)
 
     im = plt.imshow(heat_map, cmap=cmap, vmin=min_value)
@@ -226,7 +229,7 @@ def ptable_heatmap_mpl(
 
         c = (
             "w"
-            if ((vals_dict.get(k, 0) - min_value) / norm_const) > 0.6
+            if ((vals_dict.get(k, 0) - min_value) / norm_const) >= 0.5
             else "k"
         )
         if k in elements_in_data:
@@ -291,7 +294,7 @@ def ptable_heatmap_mpl(
     words = text_str.split()
     wrapped_text = ""
     line = ""
-    max_chars_per_line = 40  # Adjust based on font and rectangle width
+    max_chars_per_line = 80  # Adjust based on font and rectangle width
 
     for word in words:
         if len(line + word) + 1 <= max_chars_per_line:
@@ -305,7 +308,7 @@ def ptable_heatmap_mpl(
         wrapped_text,
         xy=(cx, cy),
         color="black",
-        fontsize=25,
+        fontsize=20,
         ha="center",
         va="center",
         wrap=False,
@@ -322,6 +325,7 @@ def ptable_heatmap_mpl(
     ax.spines["right"].set_visible(False)
     ax.spines["bottom"].set_visible(False)
     ax.spines["left"].set_visible(False)
+    plt.tight_layout()
 
     if title is None:
         filename = "-".join(stype.split(",")[:2])
@@ -330,7 +334,7 @@ def ptable_heatmap_mpl(
     if site is not None:
         site = site.replace("$", "").replace(" ", "")
         plt.savefig(
-            f"outputs/plots/ElemDist_{filename}_{site}.png",
+            f"outputs/plots/{group}_ElemDist_{filename}_{site}.png",
             dpi=300,
         )
     else:

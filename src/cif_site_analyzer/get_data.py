@@ -5,7 +5,7 @@ from collections import defaultdict
 from collections import Counter
 
 
-def load_cif(path, dev=False):
+def load_cif(path, elements=None, dev=False):
 
     if not os.path.isdir(path):
         print(f"Path {path} not found!")
@@ -16,6 +16,11 @@ def load_cif(path, dev=False):
     for cif_name in cifs:
         try:
             cif = read_cif(f"{path}{os.sep}{cif_name}")
+            if elements:
+                if len(set(cif.elements).intersection(elements)) < len(
+                    elements
+                ):
+                    continue
             data.append(
                 {
                     "Formula": cif.formula,
@@ -26,6 +31,7 @@ def load_cif(path, dev=False):
                 }
             )
         except Exception:
+            # print(e)
             print(f"Error reading {cif}")
     if dev and len(data) > 100:
         i100 = np.random.choice(list(range(len(data))), 100, replace=False)
@@ -120,7 +126,7 @@ def prepare_data_for_engine(cif_data, selected_stype):
 
             comp = f"{site['symbol']}"
             if site["occupancy"] != 1.0:
-                comp += f"{round(site['occupancy'], 2)}"
+                comp += f"{round(site['occupancy'], 4)}"
             if site_symbol in cif:
                 cif[site_symbol].append(comp)
             else:

@@ -1,6 +1,59 @@
 import re
+import importlib.resources
 import pandas as pd
+import matplotlib.colors as mcolors
 from collections import defaultdict
+
+with importlib.resources.as_file(
+    importlib.resources.files("cif_site_analyzer.data")
+    / "elemental-property-list.csv"
+) as csv_path:
+    features = pd.read_csv(csv_path)
+
+all_elements = features["Symbol"].tolist()
+MNs = dict(zip(all_elements, features["Mendeleev number"].tolist()))
+
+
+def get_colormap(color, N=256):
+
+    color_list = [(0.0, "white"), (1.0, color)]
+    cmap = None
+    cmap = mcolors.LinearSegmentedColormap.from_list(
+        "blue_purple_green_orange_red", [t[1] for t in color_list], N=N
+    )
+
+    return cmap
+
+
+def sort_group_labesl_by_MN(df, site_assigment):
+    group_MN = defaultdict(list)
+    for _, row in df.iterrows():
+        for group, sites in site_assigment.items():
+            for site in sites:
+                pform = _parse_formula(row[site])
+                for k, _ in pform.items():
+                    if k in all_elements:
+                        group_MN[group].append(MNs[k])
+
+    average_MNs = []
+    for group, mns in group_MN.items():
+        average_MNs.append([group, sum(mns) / len(mns)])
+
+    average_MNs = sorted(average_MNs, key=lambda x: x[1])
+    group_rename_map = dict(
+        zip(
+            [k[0] for k in average_MNs],
+            [f"G{i}" for i in range(1, len(average_MNs) + 1)],
+        )
+    )
+
+    avg_MNs = dict(
+        zip(
+            [f"G{i}" for i in range(1, len(average_MNs) + 1)],
+            [k[1] for k in average_MNs],
+        )
+    )
+    return group_rename_map, avg_MNs
 
 
 def concat_site_formula(row, site_assignment):
@@ -49,7 +102,7 @@ def auto_group_sites(wyckoff_symbol_elements, threshold=0.1):
             dis_score = len(el1.union(el2) - el1.intersection(el2)) / max(
                 len(el1), len(el2)
             )
-            print(ws1, ws2, dis_score)
+
             if dis_score < threshold:
                 if ws1 in grouped_sites:
                     groups[grouped_sites.get(ws1)].add(ws2)
