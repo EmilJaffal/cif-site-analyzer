@@ -45,23 +45,29 @@ def format_formula(formula):
 
 
 def ptable_heatmap_mpl(
-    vals_dict: dict, site: str, stype: str, cmap, group: str, title=None
+    vals_dict: dict,
+    site: str,
+    stype: str,
+    cmap,
+    group: str,
+    title=None,
+    font_size=35,
 ):
 
     # format site
     elements_in_data = list(vals_dict.keys())
     is_sites = False
-    if site is not None:
-        if len(site) == 1:
-            site = format_wyckoff_site_label(site[0], italicize=True)
-        else:
-            site_s = format_wyckoff_site_label(site[0], italicize=True)
-            for _site in site[1:]:
-                site_s += (
-                    f", {format_wyckoff_site_label(_site, italicize=True)}"
-                )
-                is_sites = True
-            site = site_s
+    # if site is not None:
+    #     if len(site) == 1:
+    #         site = format_wyckoff_site_label(site[0], italicize=True)
+    #     else:
+    #         site_s = format_wyckoff_site_label(site[0], italicize=True)
+    #         for _site in site[1:]:
+    #             site_s += (
+    #                 f", {format_wyckoff_site_label(_site, italicize=True)}"
+    #             )
+    #             is_sites = True
+    #         site = site_s
 
     elements = {
         "H": [1, 1],
@@ -216,11 +222,13 @@ def ptable_heatmap_mpl(
         cax=ax.inset_axes((0.19, 0.70, 0.4, 0.02)),
         orientation="horizontal",
     )
-    cbar.ax.tick_params(labelsize=25)
+    cbar.ax.tick_params(labelsize=font_size)
 
     # element symbols
     kw = dict(
-        horizontalalignment="center", verticalalignment="center", size=25
+        horizontalalignment="center",
+        verticalalignment="center",
+        size=font_size,
     )
 
     im.axes.text(2, 5.1, "*", alpha=0.6, **kw)
@@ -294,7 +302,7 @@ def ptable_heatmap_mpl(
     words = text_str.split()
     wrapped_text = ""
     line = ""
-    max_chars_per_line = 80  # Adjust based on font and rectangle width
+    max_chars_per_line = 40  # Adjust based on font and rectangle width
 
     for word in words:
         if len(line + word) + 1 <= max_chars_per_line:
@@ -308,7 +316,7 @@ def ptable_heatmap_mpl(
         wrapped_text,
         xy=(cx, cy),
         color="black",
-        fontsize=20,
+        fontsize=font_size,
         ha="center",
         va="center",
         wrap=False,

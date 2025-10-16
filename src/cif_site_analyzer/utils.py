@@ -14,6 +14,26 @@ all_elements = features["Symbol"].tolist()
 MNs = dict(zip(all_elements, features["Mendeleev number"].tolist()))
 
 
+def get_colors(colors, name_map):
+    print("The colors for the different groups are: ")
+    for i, (group, color) in enumerate(zip(name_map.keys(), colors), 1):
+        print(f"{i}. {group:<5} : {color}")
+
+    res = get_valid_input(
+        "Enter y to accept the assigned colors or n to customize : ",
+        ["Y", "y", "N", "n"],
+    )[0]
+    if res == "n":
+        prompt = f"Enter colors for groups 1..{len(name_map)}\
+            , separated by comma : "
+        colors = get_valid_input(
+            prompt,
+            mcolors.CSS4_COLORS,
+        )
+
+    return colors
+
+
 def get_colormap(color, N=256):
 
     color_list = [(0.0, "white"), (1.0, color)]
@@ -53,7 +73,12 @@ def sort_group_labesl_by_MN(df, site_assigment):
             [k[1] for k in average_MNs],
         )
     )
-    return group_rename_map, avg_MNs
+
+    ptype = _parse_formula(df.iloc[0]["Entry prototype"].split(",")[0])
+    ptype = sorted([[k, MNs[k]] for k, _ in ptype.items()], key=lambda r: r[1])
+    name_map = dict(zip(avg_MNs.keys(), [p[0] for p in ptype]))
+
+    return group_rename_map, avg_MNs, name_map
 
 
 def concat_site_formula(row, site_assignment):

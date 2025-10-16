@@ -8,6 +8,7 @@ from .utils import auto_group_sites
 from .utils import get_valid_input
 from .utils import concat_site_formula
 from .utils import sort_group_labesl_by_MN
+from .utils import get_colors
 from .features import add_features
 from .ptable_histogram import ptable_heatmap_mpl
 from .plsda import run_pls_da
@@ -46,8 +47,8 @@ cmaps = [
 
 color_dict = {
     2: ["blue", "red"],
-    3: ["blue", "purple", "red"],
-    4: ["blue", "purple", "orange", "red"],
+    3: ["blue", "grey", "red"],
+    4: ["blue", "grey", "green", "red"],
     5: ["blue", "purple", "green", "orange", "red"],
 }
 
@@ -66,6 +67,7 @@ def main():
     parser.add_argument(
         "-e", "--elements", help="Must contain the specified element(s)"
     )
+    parser.add_argument("-s", "--font_size", help="Font size", default=40)
     parser.add_argument("-Y", help="Non Interactive", action="store_true")
 
     args = parser.parse_args()
@@ -82,6 +84,9 @@ def main():
 
     if not os.path.isdir(path):
         print(f"Cannot find {path}.")
+
+    font_size = args.font_size
+    print("FS", font_size)
 
     # DATA
     cif_data = load_cif(path, elements=elements, dev=False)
@@ -156,7 +161,7 @@ def main():
     )
 
     # sort according to average MN
-    rename_map, avg_Mns = sort_group_labesl_by_MN(
+    rename_map, avg_Mns, name_map = sort_group_labesl_by_MN(
         data_df_w_groups, site_assignment
     )
     data_df_w_groups.rename(columns=rename_map, inplace=True)
@@ -169,22 +174,27 @@ def main():
     )
     site_assignment = {v[0]: v[1] for v in site_assignment}
     colors = color_dict.get(len(site_assignment))
+
+    # reassign
+    if interactive:
+        colors = get_colors(colors, name_map)
+
     data_df_w_groups.to_csv(f"outputs/csv/{selected_stype}.csv", index=False)
 
     print("\nGenerating periodic table heatmaps...")
     for i, (k, v) in enumerate(site_assignment.items()):
         v = sorted(list(v))
-        msg = f"Plotting periodic table heatmap for {k}: ({', '.join(v)}) site"
+        msg = f"Plotting periodic table heatmap for {k}: {name_map[k]} site"
         if len(v) > 1:
             msg += "s"
         print(msg)
         ptable_heatmap_mpl(
             vals_dict=get_ptable_vals_dict(data_df[v[0]].tolist()),
-            site=v,
+            site=name_map[k],
             stype=data_df.iloc[0]["Entry prototype"],
-            # cmap=cmaps[i % len(cmaps)],
             cmap=colors[i],
             group=k,
+            font_size=font_size,
         )
     print("Done, plots saved inside the directory plots.")
 

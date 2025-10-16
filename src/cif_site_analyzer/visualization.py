@@ -211,7 +211,7 @@ def visualize_elements(coord_df, sites_df=None, compounds_markers=True):
                 if note == "candidate":
                     candidate_found = True
                     marker_color = "#F60303"
-                    alpha = 0.75
+                    alpha = 0.5
                     size = COMPOUND_MARKER_SIZE * 1.5
                     line_width = (
                         COMPOUND_LINE_WIDTH * 3
@@ -221,8 +221,8 @@ def visualize_elements(coord_df, sites_df=None, compounds_markers=True):
                     candidate_marker = plt.Circle(
                         (weighted_coord[0], weighted_coord[1]),
                         radius=0.25,  # size/2 gives an appropriate radius
-                        edgecolor=marker_color,
-                        facecolor="none",  # no filling
+                        edgecolor="none",
+                        facecolor=marker_color,  # no filling
                         linestyle="-",  # dashed outline
                         linewidth=line_width,
                         alpha=alpha,
