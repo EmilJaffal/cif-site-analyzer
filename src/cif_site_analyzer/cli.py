@@ -67,7 +67,9 @@ def main():
     parser.add_argument(
         "-e", "--elements", help="Must contain the specified element(s)"
     )
-    parser.add_argument("-s", "--font_size", help="Font size", default=40)
+    parser.add_argument(
+        "-s", "--font_size", help="Font size", default=40, type=int
+    )
     parser.add_argument("-Y", help="Non Interactive", action="store_true")
 
     args = parser.parse_args()
@@ -86,7 +88,6 @@ def main():
         print(f"Cannot find {path}.")
 
     font_size = args.font_size
-    print("FS", font_size)
 
     # DATA
     cif_data = load_cif(path, elements=elements, dev=False)
@@ -130,6 +131,7 @@ def main():
         selected_stype = list(stypes.keys())[0]
 
     data_for_engine = prepare_data_for_engine(cif_data, selected_stype)
+    os.makedirs("outputs/heatmaps", exist_ok=True)
     os.makedirs("outputs/plots", exist_ok=True)
     os.makedirs("outputs/csv", exist_ok=True)
 
