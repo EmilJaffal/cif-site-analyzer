@@ -9,6 +9,7 @@ from .utils import get_valid_input
 from .utils import concat_site_formula
 from .utils import sort_group_labesl_by_MN
 from .utils import get_colors
+from .utilities import merge_images
 from .features import add_features
 from .ptable_histogram import ptable_heatmap_mpl
 from .plsda import run_pls_da
@@ -201,6 +202,8 @@ def main():
             group=k,
             font_size=font_size,
         )
+
+    merge_images("outputs/heatmaps")
 
     for i, (k, v) in enumerate(site_assignment.items()):
         v = sorted(list(v))
