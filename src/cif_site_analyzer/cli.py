@@ -132,6 +132,7 @@ def main():
 
     data_for_engine = prepare_data_for_engine(cif_data, selected_stype)
     os.makedirs("outputs/heatmaps", exist_ok=True)
+    os.makedirs("outputs/heatmaps/individual", exist_ok=True)
     os.makedirs("outputs/plots", exist_ok=True)
     os.makedirs("outputs/csv", exist_ok=True)
 
@@ -177,6 +178,8 @@ def main():
     site_assignment = {v[0]: v[1] for v in site_assignment}
     colors = color_dict.get(len(site_assignment))
 
+    color_map = dict(zip(list(site_assignment.keys()), colors))
+
     # reassign
     if interactive:
         colors = get_colors(colors, name_map)
@@ -194,10 +197,24 @@ def main():
             vals_dict=get_ptable_vals_dict(data_df[v[0]].tolist()),
             site=name_map[k],
             stype=data_df.iloc[0]["Entry prototype"],
-            cmap=colors[i],
+            cmap=color_map[k],
             group=k,
             font_size=font_size,
         )
+
+    for i, (k, v) in enumerate(site_assignment.items()):
+        v = sorted(list(v))
+        for _v in v:
+            print(f"Plotting periodic table heatmap for {_v} site")
+            ptable_heatmap_mpl(
+                vals_dict=get_ptable_vals_dict(data_df[v[0]].tolist()),
+                site=_v,
+                stype=data_df.iloc[0]["Entry prototype"],
+                cmap=color_map[k],
+                group=k,
+                font_size=font_size,
+                individual=True,
+            )
     print("Done, plots saved inside the directory plots.")
 
     # df for recommendation engine
@@ -224,7 +241,7 @@ def main():
 
     # pls-da; 2-components
     print("\nPerforming PLS-DA...")
-    pls_loadings = run_pls_da(features_df)
+    pls_loadings, _, _ = run_pls_da(features_df, color_map)
     print("Done")
 
     # elements projection
@@ -234,10 +251,13 @@ def main():
         / "elemental-property-list.csv"
     ) as csv_path:
         coords = plot_elements_from_plsda_loadings(
-            pls_loadings, df_engine, element_properties_file=csv_path
+            pls_loadings,
+            color_map,
+            df_engine,
+            element_properties_file=csv_path,
         )
-    visualize_elements(coords, df_engine, compounds_markers=False)
-    visualize_elements(coords, df_engine, compounds_markers=True)
+    visualize_elements(coords, df_engine, color_map, compounds_markers=False)
+    visualize_elements(coords, df_engine, color_map, compounds_markers=True)
     print("Done, plots saved in the directory plots.")
 
     if interactive:
@@ -284,7 +304,9 @@ def main():
         new_cpds = pd.DataFrame(new_cpds)
 
         df_engine = pd.concat([df_engine, new_cpds], axis=0, ignore_index=True)
-        visualize_elements(coords, df_engine, compounds_markers=True)
+        visualize_elements(
+            coords, df_engine, color_map, compounds_markers=True
+        )
 
         # elements for recommendations
         # elements_for_screening = get_selected_elements(site_assignment)

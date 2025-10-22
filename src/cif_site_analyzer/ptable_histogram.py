@@ -52,22 +52,12 @@ def ptable_heatmap_mpl(
     group: str,
     title=None,
     font_size=35,
+    individual=False,
 ):
 
     # format site
     elements_in_data = list(vals_dict.keys())
     is_sites = False
-    # if site is not None:
-    #     if len(site) == 1:
-    #         site = format_wyckoff_site_label(site[0], italicize=True)
-    #     else:
-    #         site_s = format_wyckoff_site_label(site[0], italicize=True)
-    #         for _site in site[1:]:
-    #             site_s += (
-    #                 f", {format_wyckoff_site_label(_site, italicize=True)}"
-    #             )
-    #             is_sites = True
-    #         site = site_s
 
     elements = {
         "H": [1, 1],
@@ -341,9 +331,16 @@ def ptable_heatmap_mpl(
         filename = title
     if site is not None:
         site = site.replace("$", "").replace(" ", "")
-        plt.savefig(
-            f"outputs/heatmaps/{group}_ElemDist_{filename}_{site}.png",
-            dpi=300,
-        )
+        if individual:
+            root = "outputs/heatmaps/individual/"
+            plt.savefig(
+                f"{root}{group}_{site}_ElemDist_{filename}.png",
+                dpi=300,
+            )
+        else:
+            plt.savefig(
+                f"outputs/heatmaps/{group}_{site}_ElemDist_{filename}.png",
+                dpi=300,
+            )
     else:
         plt.savefig(f"outputs/heatmaps/ElemDist_{filename}.png", dpi=300)

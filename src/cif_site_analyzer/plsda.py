@@ -41,7 +41,9 @@ def plot_confidence_ellipse(
     return ellipse
 
 
-def run_pls_da(df, output_loadings_excel="outputs/csv/PLS_DA_loadings.csv"):
+def run_pls_da(
+    df, color_map, output_loadings_excel="outputs/csv/PLS_DA_loadings.csv"
+):
     # -----------------------------
     # Prepare the data for PLS-DA
     # -----------------------------
@@ -78,26 +80,27 @@ def run_pls_da(df, output_loadings_excel="outputs/csv/PLS_DA_loadings.csv"):
     # -----------------
     # Generate scatter plot with ellipsoids
     # -----------------
-    colors = [
-        "tab:blue",
-        "tab:orange",
-        "tab:green",
-        "tab:red",
-        "tab:purple",
-        "tab:brown",
-        "tab:pink",
-        "tab:gray",
-        "tab:olive",
-        "tab:cyan",
-    ]
+    # colors = [
+    #     "tab:blue",
+    #     "tab:orange",
+    #     "tab:green",
+    #     "tab:red",
+    #     "tab:purple",
+    #     "tab:brown",
+    #     "tab:pink",
+    #     "tab:gray",
+    #     "tab:olive",
+    #     "tab:cyan",
+    # ]
 
     plt.style.use("ggplot")
     fig, ax = plt.subplots(figsize=(8, 6), dpi=500)
 
     unique_classes = y.unique()
-    color_map = {
-        cls: colors[i % len(colors)] for i, cls in enumerate(unique_classes)
-    }
+    print("UniqC", unique_classes)
+    # color_map = {
+    #     cls: colors[i % len(colors)] for i, cls in enumerate(unique_classes)
+    # }
 
     for cls in unique_classes:
         idx = y == cls
@@ -184,4 +187,4 @@ def run_pls_da(df, output_loadings_excel="outputs/csv/PLS_DA_loadings.csv"):
     top_contrib_df.to_csv(top_contrib_path, index=False)
     print(f"Top 10 features saved to {top_contrib_path}.")
 
-    return loadings_df
+    return loadings_df, scaler, minmax_scaler
