@@ -73,34 +73,12 @@ def run_pls_da(
     # ---------------------------------------
     total_variance = np.sum(np.var(X_normalized, axis=0))
     explained_variances = np.var(X_scores, axis=0)
-    explained_ratio = (
-        explained_variances / total_variance * 100
-    )  # array of length 2
-
-    # -----------------
-    # Generate scatter plot with ellipsoids
-    # -----------------
-    # colors = [
-    #     "tab:blue",
-    #     "tab:orange",
-    #     "tab:green",
-    #     "tab:red",
-    #     "tab:purple",
-    #     "tab:brown",
-    #     "tab:pink",
-    #     "tab:gray",
-    #     "tab:olive",
-    #     "tab:cyan",
-    # ]
+    explained_ratio = explained_variances / total_variance * 100
 
     plt.style.use("ggplot")
     fig, ax = plt.subplots(figsize=(8, 6), dpi=500)
 
     unique_classes = y.unique()
-    print("UniqC", unique_classes)
-    # color_map = {
-    #     cls: colors[i % len(colors)] for i, cls in enumerate(unique_classes)
-    # }
 
     for cls in unique_classes:
         idx = y == cls
