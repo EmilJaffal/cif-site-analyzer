@@ -1,5 +1,8 @@
 import os
 import re
+import glob
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 import numpy as np
 import pandas as pd
 from cif_site_analyzer.cif_reader import read_cif
@@ -156,3 +159,57 @@ if __name__ == "__main__":
 
     print(format_mixed_formula(form))
     print(format_formula(form))
+
+
+def merge_images(parent_dir):
+
+    print("Merging images")
+
+    png_files = glob.glob(os.path.join(parent_dir, "G*.png"))
+
+    if not png_files:
+        return
+
+    def sort_key(path):
+        fname = os.path.basename(path)
+        return int(fname[1]) if len(fname) > 1 and fname[1].isdigit() else 0
+
+    png_files_sorted = sorted(png_files, key=sort_key)
+    images = [mpimg.imread(path) for path in png_files_sorted]
+
+    # vertically stacked
+    fig_col, axes_col = plt.subplots(
+        len(images),
+        1,
+        figsize=(5 * len(images), 5),
+        gridspec_kw={"hspace": 0.1, "wspace": 0},
+    )
+    if len(images) == 1:
+        axes_col = [axes_col]
+    for ax, img in zip(axes_col, images):
+        ax.imshow(img)
+        ax.axis("off")
+
+    plt.tight_layout()
+    plt.savefig(
+        os.path.join(parent_dir, "col.png"), bbox_inches="tight", dpi=300
+    )
+    plt.close(fig_col)
+
+    # horizontally stacked
+    fig_row, axes_row = plt.subplots(
+        1,
+        len(images),
+        figsize=(5 * len(images), 5),
+        gridspec_kw={"hspace": 0, "wspace": 0},
+    )
+    if len(images) == 1:
+        axes_row = [axes_row]
+    for ax, img in zip(axes_row, images):
+        ax.imshow(img)
+        ax.axis("off")
+    plt.tight_layout()
+    plt.savefig(
+        os.path.join(parent_dir, "row.png"), bbox_inches="tight", dpi=300
+    )
+    plt.close(fig_row)

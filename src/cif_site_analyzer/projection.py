@@ -60,13 +60,13 @@ def plot_elements(
 
     for group in df["Group"].unique():
         subset = df[df["Group"] == group]
-        color = group_colors.get(group, "grey")
+        color = group_colors.get(group, "#ffffff")
         plt.scatter(
             subset["PLSDA_Component_1"],
             subset["PLSDA_Component_2"],
             color=color,
             s=600,
-            alpha=0.6,
+            alpha=0.4,
             label=group,
         )
         for _, row in subset.iterrows():
@@ -90,26 +90,13 @@ def plot_elements(
 
 def plot_elements_from_plsda_loadings(
     pls_loadings,
+    site_colors,
     sites_df=None,
     element_properties_file="data/elemental-property-list.csv",
 ):
     df_props, coordinates = prepare_coordinates(
         pls_loadings, element_properties_file
     )
-
-    # Grouping logic (optional)
-    group_colors = [
-        "tab:blue",
-        "tab:orange",
-        "tab:green",
-        "tab:red",
-        "tab:purple",
-        "tab:brown",
-        "tab:pink",
-        "tab:gray",
-        "tab:olive",
-        "tab:cyan",
-    ]
 
     unique_sites = defaultdict(set)
     if sites_df is not None:
@@ -140,9 +127,9 @@ def plot_elements_from_plsda_loadings(
         df_props["Group"] = "Other"
 
     # Plot
-    site_colors = {
-        s: group_colors[i % len(unique_sites)] for i, s in enumerate(sites)
-    }
+    # site_colors = {
+    #     s: group_colors[i % len(unique_sites)] for i, s in enumerate(sites)
+    # }
     plot_elements(df_props, site_colors)
 
     # Save coordinates

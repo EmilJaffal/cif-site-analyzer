@@ -4,6 +4,7 @@ import matplotlib.patches
 import numpy as np
 import matplotlib.pyplot as plt
 from .utils import _parse_formula
+from .utils import get_colormap
 
 
 def format_wyckoff_site_label(site_label, italicize=False):
@@ -44,23 +45,19 @@ def format_formula(formula):
 
 
 def ptable_heatmap_mpl(
-    vals_dict: dict, site: str, stype: str, cmap: str, title=None
+    vals_dict: dict,
+    site: str,
+    stype: str,
+    cmap,
+    group: str,
+    title=None,
+    font_size=35,
+    individual=False,
 ):
 
     # format site
     elements_in_data = list(vals_dict.keys())
     is_sites = False
-    if site is not None:
-        if len(site) == 1:
-            site = format_wyckoff_site_label(site[0], italicize=True)
-        else:
-            site_s = format_wyckoff_site_label(site[0], italicize=True)
-            for _site in site[1:]:
-                site_s += (
-                    f", {format_wyckoff_site_label(_site, italicize=True)}"
-                )
-                is_sites = True
-            site = site_s
 
     elements = {
         "H": [1, 1],
@@ -172,6 +169,7 @@ def ptable_heatmap_mpl(
         pmask[p - 1, g - 1] = 1
 
     min_value = min(vals_dict.values())
+    # min_value = min(vals_dict.values())
     norm_const = max(max(vals_dict.values()) - min_value, min_value)
 
     heat_map = np.full(shape=(9, 18), fill_value=-(min_value), dtype=float)
@@ -183,7 +181,8 @@ def ptable_heatmap_mpl(
 
     fig, ax = plt.subplots(figsize=(18, 9))
 
-    cmap = plt.get_cmap(cmap)
+    # cmap = plt.get_cmap(cmap)
+    cmap = get_colormap(cmap, N=256)
     cmap.set_under("w", alpha=0.1)
 
     im = plt.imshow(heat_map, cmap=cmap, vmin=min_value)
@@ -213,11 +212,13 @@ def ptable_heatmap_mpl(
         cax=ax.inset_axes((0.19, 0.70, 0.4, 0.02)),
         orientation="horizontal",
     )
-    cbar.ax.tick_params(labelsize=25)
+    cbar.ax.tick_params(labelsize=font_size)
 
     # element symbols
     kw = dict(
-        horizontalalignment="center", verticalalignment="center", size=25
+        horizontalalignment="center",
+        verticalalignment="center",
+        size=font_size,
     )
 
     im.axes.text(2, 5.1, "*", alpha=0.6, **kw)
@@ -226,7 +227,7 @@ def ptable_heatmap_mpl(
 
         c = (
             "w"
-            if ((vals_dict.get(k, 0) - min_value) / norm_const) > 0.6
+            if ((vals_dict.get(k, 0) - min_value) / norm_const) >= 0.5
             else "k"
         )
         if k in elements_in_data:
@@ -305,7 +306,7 @@ def ptable_heatmap_mpl(
         wrapped_text,
         xy=(cx, cy),
         color="black",
-        fontsize=25,
+        fontsize=font_size,
         ha="center",
         va="center",
         wrap=False,
@@ -322,6 +323,7 @@ def ptable_heatmap_mpl(
     ax.spines["right"].set_visible(False)
     ax.spines["bottom"].set_visible(False)
     ax.spines["left"].set_visible(False)
+    plt.tight_layout()
 
     if title is None:
         filename = "-".join(stype.split(",")[:2])
@@ -329,9 +331,16 @@ def ptable_heatmap_mpl(
         filename = title
     if site is not None:
         site = site.replace("$", "").replace(" ", "")
-        plt.savefig(
-            f"outputs/plots/ElemDist_{filename}_{site}.png",
-            dpi=300,
-        )
+        if individual:
+            root = "outputs/heatmaps/individual/"
+            plt.savefig(
+                f"{root}{group}_{site}_ElemDist_{filename}.png",
+                dpi=300,
+            )
+        else:
+            plt.savefig(
+                f"outputs/heatmaps/{group}_{site}_ElemDist_{filename}.png",
+                dpi=300,
+            )
     else:
-        plt.savefig(f"outputs/plots/ElemDist_{filename}.png", dpi=300)
+        plt.savefig(f"outputs/heatmaps/ElemDist_{filename}.png", dpi=300)

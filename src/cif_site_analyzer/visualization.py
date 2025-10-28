@@ -8,12 +8,14 @@ from collections import defaultdict
 COORD_MULTIPLIER = 5
 
 # Circle settings
-BASE_CIRCLE_RADIUS = 0.6
+BASE_CIRCLE_RADIUS = 0.3
 BASE_CIRCLE_LINEWIDTH = 2
-PATCH_CIRCLE_RADIUS = 0.59
+PATCH_CIRCLE_RADIUS = 0.3
+ALPHA = 0.15
+LINE_ALPHA = 0.1
 
 # Text settings
-TEXT_SIZE = 36
+TEXT_SIZE = 18
 
 # Figure size factors (to compute dimensions based on the coordinate range)
 FIGURE_WIDTH_FACTOR = 0.8
@@ -24,23 +26,9 @@ HULL_LINETYPE = "--"
 HULL_LINEWIDTH = 2
 HULL_FILL_ALPHA = 0.2
 
-# Site colors for patch overlays and convex hull outlines
-SITE_OUTLINE_COLORS = [
-    "tab:blue",
-    "tab:orange",
-    "tab:green",
-    "tab:red",
-    "tab:purple",
-    "tab:brown",
-    "tab:pink",
-    "tab:gray",
-    "tab:olive",
-    "tab:cyan",
-]
-
 # Compound marker settings
-COMPOUND_MARKER_SIZE = 20
-COMPOUND_LINE_WIDTH = 1
+COMPOUND_MARKER_SIZE = 15
+COMPOUND_LINE_WIDTH = 3
 COMPOUND_MARKER_COLOR = "black"  # default compound marker color
 
 # --------------------------------------------------------
@@ -50,7 +38,26 @@ def parse_formula_elements(formula):
     return [(k, v) for k, v in _parse_formula(formula).items()]
 
 
-def visualize_elements(coord_df, sites_df=None, compounds_markers=True):
+def custom_log(value):
+    if value < 0:
+        lv = np.log10(-1 * value)
+        return float(lv) * -1
+    else:
+        return float(np.log10(value))
+
+
+def visualize_elements(
+    coord_df,
+    sites_df,
+    site_colors,
+    compounds_markers=True,
+    figsize=None,
+    circle_radius=None,
+    patch_radius=None,
+    text_size=None,
+    group_data=None,
+    log_scale=False,
+):
     """Visualizes chemical element coordinates with site-based patches, convex
     hull outlines, and compound weighted coordinate markers with connecting
     lines.
@@ -67,20 +74,43 @@ def visualize_elements(coord_df, sites_df=None, compounds_markers=True):
     The function saves the plot with a dynamically generated
     file name and displays it.
     """
+
+    if circle_radius is None:
+        circle_radius = BASE_CIRCLE_RADIUS
+    if patch_radius is None:
+        patch_radius = PATCH_CIRCLE_RADIUS
+    if text_size is None:
+        text_size = TEXT_SIZE
+
     # ----- Load coordinates and apply scaling -----
     coord_df = coord_df.copy()
     coord_df["x"] = coord_df["x"] * COORD_MULTIPLIER
     coord_df["y"] = coord_df["y"] * COORD_MULTIPLIER
 
+    if log_scale:
+        coord_df["x"] = coord_df["x"].map(custom_log)
+        coord_df["y"] = coord_df["y"].map(custom_log)
+
     # Determine plot dimensions based on the coordinate range.
     x_min, x_max = coord_df["x"].min(), coord_df["x"].max()
     y_min, y_max = coord_df["y"].min(), coord_df["y"].max()
+
     fig_width = (x_max - x_min) * FIGURE_WIDTH_FACTOR
     fig_height = (y_max - y_min) * FIGURE_HEIGHT_FACTOR
 
+    if figsize is None:
+        figsize = (fig_width, fig_height)
+    else:
+        if fig_height > fig_width:
+            figsize = (figsize * fig_width / fig_height, figsize)
+        else:
+            figsize = (figsize, figsize * fig_height / fig_width)
+
     # Create figure with white background (no grid, no axes).
-    fig, ax = plt.subplots(figsize=(fig_width, fig_height), facecolor="white")
+    fig, ax = plt.subplots(figsize=figsize, facecolor="white")
+    fig.set_size_inches(figsize)
     ax.set_facecolor("white")
+    ax.set_aspect("equal")
     ax.axis("off")
 
     # ----- Plot base circles and element text -----
@@ -90,7 +120,7 @@ def visualize_elements(coord_df, sites_df=None, compounds_markers=True):
         element_coords[element] = (x, y)
         base_circle = plt.Circle(
             (x, y),
-            radius=BASE_CIRCLE_RADIUS,
+            radius=circle_radius,
             edgecolor="black",
             facecolor="none",
             linewidth=BASE_CIRCLE_LINEWIDTH,
@@ -102,7 +132,7 @@ def visualize_elements(coord_df, sites_df=None, compounds_markers=True):
             x,
             y,
             element,
-            fontsize=TEXT_SIZE,
+            fontsize=text_size,
             ha="center",
             va="center",
             zorder=4,
@@ -111,11 +141,7 @@ def visualize_elements(coord_df, sites_df=None, compounds_markers=True):
     # ----- Process site information to extract unique element sets -----
     unique_sites = defaultdict(set)
     if sites_df is not None:
-        sites = [
-            cn
-            for cn in sites_df.columns
-            if cn not in ["Filename", "Formula", "Notes"]
-        ]
+        sites = site_colors.keys()
         for _, row in sites_df.iterrows():
             for site in sites:
                 site_formula = row[site]
@@ -130,12 +156,12 @@ def visualize_elements(coord_df, sites_df=None, compounds_markers=True):
         patch_color = None
         for i, site in enumerate(sites):
             if element in unique_sites[site]:
-                patch_color = SITE_OUTLINE_COLORS[i % len(SITE_OUTLINE_COLORS)]
+                patch_color = site_colors[site]
                 break
         if patch_color is not None:
             patch_circle = plt.Circle(
                 (x, y),
-                radius=PATCH_CIRCLE_RADIUS,
+                radius=patch_radius,
                 edgecolor=None,
                 facecolor=patch_color,
                 alpha=0.5,
@@ -184,7 +210,8 @@ def visualize_elements(coord_df, sites_df=None, compounds_markers=True):
     # ----- Draw convex hull outlines for each site group -----
     if sites_df is not None:
         for i, site in enumerate(sites):
-            color = SITE_OUTLINE_COLORS[i % len(SITE_OUTLINE_COLORS)]
+            # color = SITE_OUTLINE_COLORS[i % len(SITE_OUTLINE_COLORS)]
+            color = site_colors[site]
             plot_site_outline(unique_sites[site], color, f"{site} Outline")
 
     # ----- Compute weighted compound markers from formula column -----
@@ -209,30 +236,39 @@ def visualize_elements(coord_df, sites_df=None, compounds_markers=True):
                 note = str(row.get("Notes", "")).strip().lower()
                 # Check if this compound row is marked as candidate.
                 if note == "candidate":
+
                     candidate_found = True
                     marker_color = "#F60303"
-                    alpha = 0.75
-                    size = COMPOUND_MARKER_SIZE * 1.5
-                    line_width = (
-                        COMPOUND_LINE_WIDTH * 3
-                    )  # Double the line width for candidate.
-                    # Instead of plotting a filled marker,
-                    # create a Circle patch:
-                    candidate_marker = plt.Circle(
-                        (weighted_coord[0], weighted_coord[1]),
-                        radius=0.25,  # size/2 gives an appropriate radius
-                        edgecolor=marker_color,
-                        facecolor="none",  # no filling
-                        linestyle="-",  # dashed outline
-                        linewidth=line_width,
-                        alpha=alpha,
-                        zorder=5,
+                    size = COMPOUND_MARKER_SIZE
+                    line_width = COMPOUND_LINE_WIDTH
+                    ax.plot(
+                        weighted_coord[0],
+                        weighted_coord[1],
+                        marker="o",
+                        markersize=size,
+                        markerfacecolor="#F60303",
+                        zorder=4,
+                        alpha=1.0,
+                        markeredgecolor="none",
                     )
-                    ax.add_patch(candidate_marker)
+                    linestyle = "-"
+                elif note == "unexplored":
+                    # print("unexp")
+                    size = COMPOUND_MARKER_SIZE
+                    line_width = COMPOUND_LINE_WIDTH
+                    ax.plot(
+                        weighted_coord[0],
+                        weighted_coord[1],
+                        marker="o",
+                        markersize=size,
+                        markerfacecolor="#03C91D",
+                        zorder=4,
+                        alpha=ALPHA,
+                        markeredgecolor="none",
+                    )
                     linestyle = "-"
                 else:
                     marker_color = COMPOUND_MARKER_COLOR
-                    alpha = 0.3
                     size = COMPOUND_MARKER_SIZE
                     line_width = COMPOUND_LINE_WIDTH
                     # For standard markers, use the filled marker version:
@@ -242,8 +278,8 @@ def visualize_elements(coord_df, sites_df=None, compounds_markers=True):
                         marker="o",
                         markersize=size,
                         markerfacecolor=marker_color,
-                        zorder=5,
-                        alpha=alpha,
+                        zorder=3,
+                        alpha=ALPHA,
                         markeredgecolor="none",
                     )
                     linestyle = "-"
@@ -255,13 +291,14 @@ def visualize_elements(coord_df, sites_df=None, compounds_markers=True):
                     ax.plot(
                         [weighted_coord[0], el_coord[0]],
                         [weighted_coord[1], el_coord[1]],
-                        color=marker_color,
+                        color="grey",
                         linestyle=linestyle,
                         linewidth=line_width,
                         zorder=4,
-                        alpha=alpha,
+                        alpha=LINE_ALPHA,
                     )
-
+    # plt.plot([0, 0], [-1, 1])
+    # plt.plot([-1, 1], [0, 0])
     plt.tight_layout()
 
     # ----- Build output file name based on conditions -----

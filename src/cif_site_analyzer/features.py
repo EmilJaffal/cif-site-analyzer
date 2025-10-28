@@ -1,11 +1,16 @@
 import pandas as pd
 import numpy as np
+import importlib.resources
 from .utils import _parse_formula
 
 
 def add_features(df, features_csv=None):
     if features_csv is None:
-        features = pd.read_csv("data/elemental-property-list.csv")
+        with importlib.resources.as_file(
+            importlib.resources.files("cif_site_analyzer.data")
+            / "elemental-property-list.csv"
+        ) as csv_path:
+            features = pd.read_csv(csv_path)
     else:
         features = pd.read_csv(features_csv)
 
@@ -16,11 +21,13 @@ def add_features(df, features_csv=None):
     warned_elements = []
 
     def compute_features(formula, normalize=True):
+
         formula = _parse_formula(formula)
         if normalize:
             total = sum(formula.values())
-            for k in formula.keys():
-                formula[k] = formula[k] / total
+            if total > 0:
+                for k in formula.keys():
+                    formula[k] = formula[k] / total
 
         symbols, coeffs = [], []
         for k, v in formula.items():

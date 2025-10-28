@@ -1,8 +1,8 @@
-Component 1 (24.3%),Component 2 (33.0%)
+Component 1 (24.2%),Component 2 (33.0%)
 Group,Atomic number
 valence p,Atomic weight
-Mendeleev number,DFT ScRLDA Exc
-Metal(1)/ metalloid(2)/ nonmetal(3),DFT RLDA Exc
+Metal(1)/ metalloid(2)/ nonmetal(3),DFT ScRLDA Exc
+Mendeleev number,DFT RLDA Exc
 outer shell electrons,DFT LDA Exc
 Families,DFT LSD Exc
 Gilman no. of valence electrons,DFT LSD Ecoul
