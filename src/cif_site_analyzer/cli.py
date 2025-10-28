@@ -87,6 +87,8 @@ def main():
 
     if not os.path.isdir(path):
         print(f"Cannot find {path}.")
+    path = os.path.join(os.getcwd(), path)
+    os.chdir(path)
 
     font_size = args.font_size
 
@@ -147,9 +149,6 @@ def main():
         wyckoff_symbol_elements[ws] = list(data_df[ws].unique())
 
     site_assignment = auto_group_sites(wyckoff_symbol_elements)
-
-    if len(site_assignment) != 4:
-        print("Error", selected_stype)
 
     if interactive:
         site_assignment = assign_labels_for_sites(
