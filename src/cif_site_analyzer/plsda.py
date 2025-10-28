@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from cif_site_analyzer.config import FEATURE_GROUPS_PLSDA
 from matplotlib.patches import Ellipse
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.cross_decomposition import PLSRegression
@@ -165,4 +166,77 @@ def run_pls_da(
     top_contrib_df.to_csv(top_contrib_path, index=False)
     print(f"Top 10 features saved to {top_contrib_path}.")
 
+    plot_loadings(loadings_df, explained_ratio)
+
     return loadings_df, scaler, minmax_scaler
+
+
+def plot_loadings(loadings_df, explained_ratio):
+
+    colors = {
+        "Themal & Physical Properties": "tab:green",
+        "Electronegativity and Electron Affinity": "tab:olive",
+        "DFT RLDA & ScRLDA Properties": "tab:brown",
+        "Basic Atomic Properties": "tab:red",
+        "DFT LDA & LSD Properties": "tab:purple",
+        "Atomic and Ionic Radii": "tab:blue",
+        "Valence Properties": "tab:orange",
+    }
+
+    plt.clf()
+    plt.close("all")
+    plt.style.use("ggplot")
+    xr = (
+        loadings_df["Component_1_Loading"].max()
+        - loadings_df["Component_1_Loading"].min()
+    )
+    yr = (
+        loadings_df["Component_2_Loading"].max()
+        - loadings_df["Component_2_Loading"].min()
+    )
+
+    added_legends = []
+    for i, (_, row) in enumerate(loadings_df.iterrows(), 1):
+        gname = FEATURE_GROUPS_PLSDA[row["Feature"]]
+
+        if gname in added_legends:
+            plt.scatter(
+                row["Component_1_Loading"],
+                row["Component_2_Loading"],
+                color=colors[gname],
+                s=150,
+                alpha=0.5,
+            )
+        else:
+            plt.scatter(
+                row["Component_1_Loading"],
+                row["Component_2_Loading"],
+                color=colors[gname],
+                s=150,
+                alpha=0.5,
+                label=gname,
+            )
+
+            added_legends.append(gname)
+
+        plt.text(
+            row["Component_1_Loading"] - xr * 0.015,
+            row["Component_2_Loading"] - yr * 0.013,
+            s=f"{i:02}",
+            fontsize=8,
+        )
+
+    plt.xlabel(f"LV1 ({explained_ratio[0]:.1f}%)")
+    plt.ylabel(f"LV2 ({explained_ratio[1]:.1f}%)")
+
+    plt.legend(
+        loc="lower center",
+        bbox_to_anchor=(0.5, -0.1),
+        bbox_transform=plt.gcf().transFigure,
+        ncol=2,
+        frameon=True,
+        fontsize=10,
+    )
+
+    plt.tight_layout()
+    plt.savefig("outputs/plots/Feature_loadings.svg", bbox_inches="tight")
