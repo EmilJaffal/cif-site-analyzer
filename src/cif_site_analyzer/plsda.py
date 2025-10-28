@@ -175,11 +175,11 @@ def plot_loadings(loadings_df, explained_ratio):
 
     colors = {
         "Themal & Physical Properties": "tab:green",
-        "Electronegativity and Electron Affinity": "tab:olive",
+        "Electronegativity & Electron Affinity": "tab:olive",
         "DFT RLDA & ScRLDA Properties": "tab:brown",
         "Basic Atomic Properties": "tab:red",
         "DFT LDA & LSD Properties": "tab:purple",
-        "Atomic and Ionic Radii": "tab:blue",
+        "Atomic & Ionic Radii": "tab:blue",
         "Valence Properties": "tab:orange",
     }
 
