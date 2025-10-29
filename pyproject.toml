@@ -14,9 +14,12 @@ site_analyzer = "cif_site_analyzer.cli:main"
 include-package-data = true
 
 [tool.setuptools.packages.find]
-where = ["src", "data"]  # list of folders that contain the packages (["."] by default)
+where = ["src"]  # list of folders that contain the packages (["."] by default)
 include = ["*"]  # package names should match these glob patterns (["*"] by default)
 exclude = []  # exclude packages matching these glob patterns (empty by default)
+
+[tool.setuptools.package-data]
+"cif_site_analyzer.data" = ["*.csv"]
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements/pip.txt"]}
