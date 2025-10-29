@@ -19,7 +19,7 @@ include = ["*"]  # package names should match these glob patterns (["*"] by defa
 exclude = []  # exclude packages matching these glob patterns (empty by default)
 
 [tool.setuptools.package-data]
-"csa.data" = ["*.csv"]
+"cif_site_analyzer.data" = ["*.csv"]
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements/pip.txt"]}
