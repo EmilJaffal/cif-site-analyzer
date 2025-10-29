@@ -283,8 +283,8 @@ def main():
                 nc = 1
                 while not all_added:
                     new_cpd = get_valid_input(
-                        "Enter the elements (without coefficients) at each \n"
-                        "site-group\n for the new compound \
+                        "Enter the elements (without coefficients) at each "
+                        "site-group for the new compound \
                             separated by comma : ",
                         None,
                     )

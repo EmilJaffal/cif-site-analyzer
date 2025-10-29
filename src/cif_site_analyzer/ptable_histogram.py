@@ -55,7 +55,6 @@ def ptable_heatmap_mpl(
     individual=False,
 ):
 
-    # format site
     elements_in_data = list(vals_dict.keys())
     is_sites = False
 
@@ -274,6 +273,8 @@ def ptable_heatmap_mpl(
         except Exception:
             return formula.strip()
 
+    if individual:
+        site = format_wyckoff_site_label(site, italicize=True)
     if site is not None:
         text_str = f"element distribution of {site} site in "
         text_str += (
