@@ -56,9 +56,7 @@ color_dict = {
 
 def main():
     description = """
-        A High Throughput LMTO Calculator.
-
-        This code automates the LMTO calculations using TB-LMTO program.
+        CIF Site Analyzer
 
         """
     parser = argparse.ArgumentParser(
@@ -148,7 +146,7 @@ def main():
     for ws in wyckoff_symbols:
         wyckoff_symbol_elements[ws] = list(data_df[ws].unique())
 
-    site_assignment = auto_group_sites(wyckoff_symbol_elements)
+    site_assignment = auto_group_sites(wyckoff_symbol_elements, selected_stype)
 
     if interactive:
         site_assignment = assign_labels_for_sites(
@@ -176,6 +174,7 @@ def main():
         reverse=False,
     )
     site_assignment = {v[0]: v[1] for v in site_assignment}
+
     colors = color_dict.get(len(site_assignment))
 
     color_map = dict(zip(list(site_assignment.keys()), colors))
