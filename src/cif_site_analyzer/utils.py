@@ -46,6 +46,7 @@ def get_colormap(color, N=256):
 
 
 def sort_group_labesl_by_MN(df, site_assigment):
+
     group_MN = defaultdict(list)
     for _, row in df.iterrows():
         for group, sites in site_assigment.items():
@@ -104,7 +105,9 @@ def concat_site_formula(row, site_assignment):
     return group_formulae
 
 
-def auto_group_sites(wyckoff_symbol_elements, threshold=0.1):
+def auto_group_sites(wyckoff_symbol_elements, stype):
+
+    elem_sites = _parse_formula(stype.split(",")[0]).keys()
 
     wyckoff_symbol_elements_s = []
     for ws, site_formula in wyckoff_symbol_elements.items():
@@ -117,31 +120,55 @@ def auto_group_sites(wyckoff_symbol_elements, threshold=0.1):
             elements.add(form[-1][0])
         wyckoff_symbol_elements_s.append([ws, elements])
 
-    groups = {}
-    grouped_sites = {}
-    gc = 1
-    for i in range(len(wyckoff_symbol_elements_s)):
-        ws1, el1 = wyckoff_symbol_elements_s[i]
-        for j in range(i + 1, len(wyckoff_symbol_elements_s)):
-            ws2, el2 = wyckoff_symbol_elements_s[j]
-            dis_score = len(el1.union(el2) - el1.intersection(el2)) / max(
-                len(el1), len(el2)
-            )
+    threshold = 0.1
+    delta = 0.05
+    n_try = 0
+    converged = False
+    while not converged:
+        groups = {}
+        grouped_sites = {}
+        gc = 1
+        for i in range(len(wyckoff_symbol_elements_s)):
+            ws1, el1 = wyckoff_symbol_elements_s[i]
+            for j in range(i + 1, len(wyckoff_symbol_elements_s)):
+                ws2, el2 = wyckoff_symbol_elements_s[j]
 
-            if dis_score < threshold:
-                if ws1 in grouped_sites:
-                    groups[grouped_sites.get(ws1)].add(ws2)
-                    grouped_sites[ws2] = grouped_sites.get(ws1)
-                else:
-                    groups[f"G{gc}"] = set([ws1, ws2])
-                    grouped_sites[ws1] = f"G{gc}"
-                    grouped_sites[ws2] = f"G{gc}"
-                    gc += 1
-        if ws1 not in grouped_sites:
-            groups[f"G{gc}"] = set([ws1])
-            gc += 1
+                dis_score = len(el1.union(el2) - el1.intersection(el2)) / max(
+                    len(el1), len(el2)
+                )
+
+                if dis_score <= threshold:
+                    if ws1 in grouped_sites:
+                        groups[grouped_sites.get(ws1)].add(ws2)
+                        grouped_sites[ws2] = grouped_sites.get(ws1)
+                    else:
+                        groups[f"G{gc}"] = set([ws1, ws2])
+                        grouped_sites[ws1] = f"G{gc}"
+                        grouped_sites[ws2] = f"G{gc}"
+                        gc += 1
+            if ws1 not in grouped_sites:
+                groups[f"G{gc}"] = set([ws1])
+                gc += 1
+            else:
+                grouped_sites[ws1] = grouped_sites.get(ws1)
+
+        if len(elem_sites) == len(groups):
+            converged = True
         else:
-            grouped_sites[ws1] = grouped_sites.get(ws1)
+            threshold += delta
+
+        n_try += 1
+        if n_try > 18 and delta != 0.01:
+            threshold = 0.01
+            delta = 0.01
+
+        if n_try > 120:
+            print(
+                "Threshold value for group assignment did not converge."
+                "Assign the groups manually."
+            )
+            return groups
+
     return groups
 
 
@@ -461,8 +488,8 @@ def _parse_formula(formula: str, strict: bool = True) -> dict[str, float]:
     """
     # Raise error if formula contains special characters
     # or only spaces and/or numbers
-    if "'" in formula:
-        formula = formula.replace("'", "")
+    for char in ["'", "-", "+", "-"]:
+        formula = formula.replace(char, "")
 
     if strict and re.match(r"[\s\d.*/]*$", formula):
         print(formula)
